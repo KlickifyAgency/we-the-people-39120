@@ -29,7 +29,7 @@ export default function HomePage() {
 
       <div style={{background:`linear-gradient(160deg,${C.blueSoft} 0%,${C.white} 100%)`,padding:'40px 24px 32px',textAlign:'center',borderBottom:`1px solid ${C.border}`}}>
         <div style={{display:'flex',justifyContent:'center',marginBottom:20}}>
-          <img src="/logo-purple.png" alt="We The People 39120" style={{height:140,objectFit:'contain',filter:'brightness(0) saturate(100%) invert(28%) sepia(89%) saturate(1000%) hue-rotate(195deg) brightness(90%) contrast(95%)'}} />
+          <img src="/logo-wtp.png" alt="We The People 39120" style={{height:140,objectFit:'contain'}} />
         </div>
         <h1 style={{fontSize:30,fontWeight:900,color:C.textMain,lineHeight:1.2,marginBottom:10}}>
           We See It.<br/>We Report It.<br/><span style={{color:C.blue}}>We Fix It — Together.</span>

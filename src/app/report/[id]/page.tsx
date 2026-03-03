@@ -148,30 +148,30 @@ export default function ReportPage({ params }: { params: any }) {
           </div>
         ) : (
           <div style={{ background: '#16162a', border: '1px solid rgba(168,85,247,0.2)', borderRadius: 16, padding: '24px' }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#e4e4f0', marginBottom: 8 }}>Alderman Response</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#e4e4f0', marginBottom: 8 }}>Community Update</div>
             <p style={{ fontSize: 13, color: '#6b6b8a', marginBottom: 20, lineHeight: 1.7 }}>
-              If you are the alderman for this ward, you may respond publicly here. Your response will be visible to all Natchez residents.
+              Have additional information about this issue? Add a community update to help your neighbors and the alderman better understand the situation.
             </p>
             {submitted ? (
               <div style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 12, padding: 16, textAlign: 'center' }}>
-                <p style={{ color: '#86efac', fontWeight: 700 }}>✅ Response submitted successfully. The community can now see your response.</p>
+                <p style={{ color: '#86efac', fontWeight: 700 }}>✅ Update submitted. Thank you for helping the community!</p>
               </div>
             ) : (
               <>
                 <textarea
                   value={response}
                   onChange={e => { setResponse(e.target.value); setError(''); }}
-                  placeholder="Write your official response here. Be specific about what action you will take and when..."
-                  rows={5}
+                  placeholder="Add more details — how long has this been here? Is it getting worse? Any other context that helps..."
+                  rows={4}
                   style={{ width: '100%', background: '#0f0f1a', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 12, padding: '14px 16px', color: '#e4e4f0', fontSize: 14, resize: 'vertical', outline: 'none', marginBottom: 12, fontFamily: 'inherit' }}
                 />
                 {error && <p style={{ color: '#fca5a5', fontSize: 13, marginBottom: 12 }}>{error}</p>}
                 <button
                   onClick={handleRespond}
                   disabled={submitting}
-                  style={{ width: '100%', background: 'linear-gradient(135deg,#7c3aed,#a855f7)', color: 'white', border: 'none', borderRadius: 12, padding: '14px', fontWeight: 800, fontSize: 15, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}
+                  style={{ width: '100%', background: 'linear-gradient(135deg,#1A5EA8,#2D7A4F)', color: 'white', border: 'none', borderRadius: 12, padding: '14px', fontWeight: 800, fontSize: 15, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}
                 >
-                  {submitting ? 'Submitting...' : 'Submit Public Response'}
+                  {submitting ? 'Submitting...' : 'Submit Community Update'}
                 </button>
               </>
             )}
