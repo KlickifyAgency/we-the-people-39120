@@ -1,176 +1,161 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
+import { ThumbsUp, MapPin, CheckCircle2, Loader2 } from 'lucide-react';
 
-const CATEGORY_LABELS: Record<string, string> = {
-  graffiti: 'Graffiti / Vandalism',
-  dumping: 'Illegal Dumping',
-  abandoned_vehicle: 'Abandoned Vehicle',
-  property_neglect: 'Property Neglect',
-  noise: 'Noise Complaint',
-  street_issues: 'Street / Pothole Issues',
-  vegetation: 'Overgrown Vegetation',
-  animal: 'Animal Issues',
-  safety_hazard: 'Safety Hazard',
-  water_drainage: 'Water / Drainage',
-  public_safety: 'Public Safety / Crime',
-};
+const C = { bg:'#F7F9FC',white:'#FFFFFF',border:'#DDE3EC',blue:'#1A5EA8',blueSoft:'#EBF2FB',green:'#2D7A4F',greenSoft:'#E8F5EE',amber:'#B45309',textMain:'#0F172A',textSub:'#475569',textMuted:'#94A3B8',danger:'#DC2626' };
+const LABELS: Record<string,string> = { graffiti:'Graffiti / Vandalism',dumping:'Illegal Dumping',abandoned_vehicle:'Abandoned Vehicle',property_neglect:'Property Neglect',noise:'Noise Complaint',street_issues:'Street / Pothole Issues',vegetation:'Overgrown Vegetation',animal:'Animal Issues',safety_hazard:'Safety Hazard',water_drainage:'Water / Drainage',public_safety:'Public Safety / Crime' };
 
 function DaysCounter({ createdAt }: { createdAt: string }) {
-  const created = new Date(createdAt);
-  const now = new Date();
-  const days = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+  const days = Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000);
   const remaining = 30 - days;
   const pct = Math.min((days / 30) * 100, 100);
-  const color = days < 10 ? '#22c55e' : days < 20 ? '#f59e0b' : '#ef4444';
-
+  const color = days < 10 ? C.green : days < 20 ? C.amber : C.danger;
   return (
-    <div style={{ background: '#0f0f1a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '20px 24px', marginBottom: 20 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#a4a4b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>30-Day Response Clock</span>
-        <span style={{ fontSize: 13, fontWeight: 800, color }}>Day {days} of 30</span>
+    <div style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:16,padding:'18px 20px',marginBottom:16}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+        <span style={{fontSize:12,fontWeight:700,color:C.textMuted,textTransform:'uppercase',letterSpacing:'0.08em'}}>30-Day Response Clock</span>
+        <span style={{fontSize:13,fontWeight:800,color}}>{days < 30 ? `Day ${days} of 30` : 'Overdue'}</span>
       </div>
-      <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 100, overflow: 'hidden', marginBottom: 10 }}>
-        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 100, transition: 'width 0.5s ease' }} />
+      <div style={{height:8,background:C.border,borderRadius:100,overflow:'hidden',marginBottom:8}}>
+        <div style={{height:'100%',width:`${pct}%`,background:color,borderRadius:100,transition:'width 0.5s ease'}} />
       </div>
-      <p style={{ fontSize: 12, color: '#6b6b8a' }}>
-        {remaining > 0
-          ? `${remaining} days remaining before this is flagged as ignored`
-          : 'This report has exceeded 30 days — flagged as ignored'}
-      </p>
+      <p style={{fontSize:12,color:C.textMuted}}>{remaining > 0 ? `${remaining} days remaining before flagged as Pending Resolution` : 'Exceeded 30 days — flagged as Pending Resolution'}</p>
     </div>
   );
 }
 
 export default function ReportPage({ params }: { params: any }) {
   const [report, setReport] = useState<any>(null);
-  const [response, setResponse] = useState('');
+  const [reportId, setReportId] = useState('');
+  const [comment, setComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [metooCount, setMetooCount] = useState(0);
+  const [metooLoading, setMetooLoading] = useState(false);
+  const [metooPressed, setMetooPressed] = useState(false);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
-  const [reportId, setReportId] = useState<string>('');
-
-  useEffect(() => {
-    Promise.resolve(params).then(p => setReportId(p.id));
-  }, []);
+  useEffect(() => { Promise.resolve(params).then(p => setReportId(p.id)); }, []);
 
   useEffect(() => {
     if (!reportId) return;
     supabase.from('reports').select('*, ward:wards(ward_number)').eq('id', reportId).single()
-      .then(({ data, error }) => {
-        if (error) console.error('Report fetch error:', error);
-        setReport(data);
-      });
+      .then(({ data }) => { setReport(data); setMetooCount(data?.me_too_count ?? 0); });
   }, [reportId]);
 
-  async function handleRespond() {
-    if (response.trim().length < 10) { setError('Please write at least 10 characters.'); return; }
+  const handleMetoo = async () => {
+    if (metooLoading || metooPressed) return;
+    setMetooLoading(true);
+    setMetooCount(c => c + 1);
+    setMetooPressed(true);
+    await fetch(`/api/v1/reports/${reportId}/metoo`, { method: 'POST' });
+    setMetooLoading(false);
+  };
+
+  const handleComment = async () => {
+    if (comment.trim().length < 5) { setError('Please write at least 5 characters.'); return; }
     setSubmitting(true);
-    const res = await fetch(`/api/v1/reports/${reportId}/respond`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ response }),
-    });
-    if (res.ok) { setSubmitted(true); setReport((r: any) => ({ ...r, alderman_response: response, alderman_responded_at: new Date().toISOString() })); }
-    else setError('Failed to submit. Please try again.');
-    setSubmitting(false);
-  }
+    await supabase.from('reports').update({ community_comment: comment }).eq('id', reportId);
+    setSubmitted(true); setSubmitting(false);
+  };
 
-  if (!reportId || !report) return (
-    <div style={{ minHeight: '100vh', background: '#0a0a14', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
-      <div style={{ width: 40, height: 40, border: '3px solid rgba(168,85,247,0.3)', borderTop: '3px solid #a855f7', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-      <p style={{ color: '#6b6b8a', fontSize: 14 }}>Loading report...</p>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
   if (!report) return (
-    <div style={{ minHeight: '100vh', background: '#0a0a14', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#6b6b8a' }}>Loading report...</p>
+    <div style={{minHeight:'100vh',background:C.bg,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:12}}>
+      <Loader2 size={36} color={C.blue} className="animate-spin" />
+      <p style={{color:C.textMuted,fontSize:14}}>Loading report...</p>
     </div>
   );
 
+  const days = Math.floor((Date.now() - new Date(report.created_at).getTime()) / 86400000);
   const mapsUrl = `https://maps.google.com/?q=${report.lat},${report.lng}`;
-  const days = Math.floor((new Date().getTime() - new Date(report.created_at).getTime()) / (1000 * 60 * 60 * 24));
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a14', color: '#e4e4f0', fontFamily: '-apple-system,BlinkMacSystemFont,sans-serif', padding: '32px 16px' }}>
-      <div style={{ maxWidth: 600, margin: '0 auto' }}>
+    <div style={{minHeight:'100vh',background:C.bg,fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',paddingBottom:100}}>
+      <div style={{background:`linear-gradient(135deg,${C.blue},${C.green})`,padding:'44px 20px 24px',textAlign:'center'}}>
+        <div style={{display:'inline-block',background:'rgba(255,255,255,0.2)',borderRadius:100,padding:'4px 14px',fontSize:11,fontWeight:700,color:'white',letterSpacing:'0.08em',textTransform:'uppercase',marginBottom:10}}>Community Report</div>
+        <h1 style={{fontSize:22,fontWeight:900,color:'white',marginBottom:4}}>{LABELS[report.category] ?? report.category}</h1>
+        <p style={{fontSize:13,color:'rgba(255,255,255,0.8)'}}>#{reportId.slice(0,8).toUpperCase()} · Natchez, MS 39120</p>
+      </div>
 
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ display: 'inline-block', background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: 100, padding: '4px 14px', fontSize: 11, fontWeight: 700, color: 'white', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
-            We The People 39120
+      <div style={{maxWidth:560,margin:'0 auto',padding:'20px 16px'}}>
+
+        {report.photo_url && (
+          <div style={{borderRadius:16,overflow:'hidden',marginBottom:16,border:`1px solid ${C.border}`}}>
+            <img src={report.photo_url} alt="Report photo" style={{width:'100%',maxHeight:280,objectFit:'cover',display:'block'}} />
           </div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6 }}>Community Report</h1>
-          <p style={{ fontSize: 13, color: '#6b6b8a' }}>#{reportId.slice(0, 8).toUpperCase()} · {CATEGORY_LABELS[report.category] ?? report.category}</p>
+        )}
+
+        <div style={{background:C.white,border:`2px solid ${metooPressed ? C.blue : C.border}`,borderRadius:16,padding:'16px 20px',marginBottom:16,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
+          <div>
+            <div style={{fontSize:15,fontWeight:800,color:C.textMain,marginBottom:2}}>
+              {metooCount > 0 ? `${metooCount} neighbor${metooCount !== 1 ? 's' : ''} agree${metooCount === 1 ? 's' : ''}` : 'Be the first to support this report'}
+            </div>
+            <div style={{fontSize:13,color:C.textMuted}}>Tap to add your voice — more support means more pressure</div>
+          </div>
+          <button onClick={handleMetoo} disabled={metooPressed}
+            style={{display:'flex',flexDirection:'column',alignItems:'center',gap:4,background:metooPressed ? C.blue : C.blueSoft,border:'none',borderRadius:14,padding:'12px 16px',cursor:metooPressed ? 'default' : 'pointer',transition:'all 0.2s',flexShrink:0}}>
+            <ThumbsUp size={22} color={metooPressed ? 'white' : C.blue} />
+            <span style={{fontSize:11,fontWeight:800,color:metooPressed ? 'white' : C.blue}}>Me Too!</span>
+          </button>
         </div>
 
         <DaysCounter createdAt={report.created_at} />
 
-        <div style={{ background: '#16162a', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, overflow: 'hidden', marginBottom: 20 }}>
+        <div style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:16,overflow:'hidden',marginBottom:16}}>
           {[
-            ['Issue', CATEGORY_LABELS[report.category] ?? report.category],
-            ['Location', `Ward ${report.ward_id ?? 'Unknown'}, Natchez MS 39120`],
-            ['Filed', new Date(report.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })],
-            ['Status', report.alderman_response ? '✅ Alderman Responded' : days >= 30 ? '🔴 Ignored — 30 Days Exceeded' : '⏳ Awaiting Response'],
+            ['Issue', LABELS[report.category] ?? report.category],
+            ['Ward', `Ward ${report.ward?.ward_number ?? 'Unknown'} — Natchez, MS`],
+            ['Filed', new Date(report.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})],
+            ['Support', `${metooCount} neighbor${metooCount !== 1 ? 's' : ''} supporting`],
+            ['Status', report.alderman_response ? '✅ Alderman Responded' : days >= 30 ? '🔴 Pending Resolution' : '⏳ Awaiting Response'],
           ].map(([label, value]) => (
-            <div key={label} style={{ display: 'flex', padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-              <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6b6b8a', minWidth: 90 }}>{label}</span>
-              <span style={{ fontSize: 14, color: '#e4e4f0', flex: 1 }}>{value}</span>
+            <div key={label} style={{display:'flex',padding:'13px 16px',borderBottom:`1px solid ${C.border}`}}>
+              <span style={{fontSize:11,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em',color:C.textMuted,minWidth:80}}>{label}</span>
+              <span style={{fontSize:14,color:C.textMain,flex:1,fontWeight:600}}>{value}</span>
             </div>
           ))}
           {report.description && (
-            <div style={{ display: 'flex', padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-              <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6b6b8a', minWidth: 90 }}>Message</span>
-              <span style={{ fontSize: 14, color: '#a4a4b8', flex: 1, fontStyle: 'italic' }}>"{report.description}"</span>
+            <div style={{padding:'13px 16px'}}>
+              <span style={{fontSize:11,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em',color:C.textMuted,display:'block',marginBottom:6}}>Description</span>
+              <span style={{fontSize:14,color:C.textSub,fontStyle:'italic'}}>"{report.description}"</span>
             </div>
           )}
         </div>
 
-        <a href={mapsUrl} target="_blank" rel="noreferrer" style={{ display: 'block', textAlign: 'center', background: 'linear-gradient(135deg,#7c3aed,#a855f7)', color: 'white', textDecoration: 'none', padding: '14px 24px', borderRadius: 12, fontWeight: 700, fontSize: 15, marginBottom: 24 }}>
-          View Location on Google Maps
+        <a href={mapsUrl} target="_blank" rel="noreferrer"
+          style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,background:C.blue,color:'white',textDecoration:'none',height:52,borderRadius:14,fontWeight:700,fontSize:15,marginBottom:16,boxShadow:'0 4px 16px rgba(26,94,168,0.3)'}}>
+          <MapPin size={18} /> View Location on Google Maps
         </a>
 
         {report.alderman_response ? (
-          <div style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 16, padding: '24px' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
-              ✅ Official Alderman Response
+          <div style={{background:C.greenSoft,border:`1px solid ${C.green}`,borderRadius:16,padding:20,marginBottom:16}}>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:12}}>
+              <CheckCircle2 size={20} color={C.green} />
+              <span style={{fontSize:13,fontWeight:800,color:C.green,textTransform:'uppercase',letterSpacing:'0.06em'}}>Official Alderman Response</span>
             </div>
-            <p style={{ fontSize: 15, color: '#e4e4f0', lineHeight: 1.7, marginBottom: 12 }}>"{report.alderman_response}"</p>
-            <p style={{ fontSize: 12, color: '#6b6b8a' }}>
-              Responded on {new Date(report.alderman_responded_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
+            <p style={{fontSize:15,color:C.textMain,lineHeight:1.75,marginBottom:10}}>"{report.alderman_response}"</p>
+            <p style={{fontSize:12,color:C.textMuted}}>Responded on {new Date(report.alderman_responded_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
           </div>
         ) : (
-          <div style={{ background: '#16162a', border: '1px solid rgba(168,85,247,0.2)', borderRadius: 16, padding: '24px' }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#e4e4f0', marginBottom: 8 }}>Community Update</div>
-            <p style={{ fontSize: 13, color: '#6b6b8a', marginBottom: 20, lineHeight: 1.7 }}>
-              Have additional information about this issue? Add a community update to help your neighbors and the alderman better understand the situation.
-            </p>
+          <div style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:16,padding:20,marginBottom:16}}>
+            <div style={{fontSize:15,fontWeight:800,color:C.textMain,marginBottom:6}}>Community Update</div>
+            <p style={{fontSize:13,color:C.textMuted,marginBottom:14,lineHeight:1.6}}>Have additional info about this issue? Help your neighbors and the alderman.</p>
             {submitted ? (
-              <div style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 12, padding: 16, textAlign: 'center' }}>
-                <p style={{ color: '#86efac', fontWeight: 700 }}>✅ Update submitted. Thank you for helping the community!</p>
+              <div style={{background:C.greenSoft,border:`1px solid ${C.green}`,borderRadius:12,padding:16,textAlign:'center'}}>
+                <p style={{color:C.green,fontWeight:700}}>✅ Update submitted. Thank you!</p>
               </div>
             ) : (
               <>
-                <textarea
-                  value={response}
-                  onChange={e => { setResponse(e.target.value); setError(''); }}
-                  placeholder="Add more details — how long has this been here? Is it getting worse? Any other context that helps..."
+                <textarea value={comment} onChange={e => { setComment(e.target.value); setError(''); }}
+                  placeholder="How long has this been here? Is it getting worse? Any other context..."
                   rows={4}
-                  style={{ width: '100%', background: '#0f0f1a', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 12, padding: '14px 16px', color: '#e4e4f0', fontSize: 14, resize: 'vertical', outline: 'none', marginBottom: 12, fontFamily: 'inherit' }}
-                />
-                {error && <p style={{ color: '#fca5a5', fontSize: 13, marginBottom: 12 }}>{error}</p>}
-                <button
-                  onClick={handleRespond}
-                  disabled={submitting}
-                  style={{ width: '100%', background: 'linear-gradient(135deg,#1A5EA8,#2D7A4F)', color: 'white', border: 'none', borderRadius: 12, padding: '14px', fontWeight: 800, fontSize: 15, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}
-                >
+                  style={{width:'100%',padding:'14px 16px',borderRadius:12,border:`1.5px solid ${error ? C.danger : C.border}`,fontSize:14,lineHeight:1.65,resize:'none',outline:'none',color:C.textMain,fontFamily:'inherit',boxSizing:'border-box',background:C.bg}} />
+                {error && <p style={{fontSize:13,color:C.danger,marginTop:6}}>{error}</p>}
+                <button onClick={handleComment} disabled={submitting}
+                  style={{width:'100%',height:48,marginTop:10,borderRadius:12,fontWeight:700,fontSize:15,color:'white',background:C.blue,border:'none',cursor:'pointer',opacity:submitting?0.7:1}}>
                   {submitting ? 'Submitting...' : 'Submit Community Update'}
                 </button>
               </>
@@ -178,9 +163,7 @@ export default function ReportPage({ params }: { params: any }) {
           </div>
         )}
 
-        <p style={{ textAlign: 'center', fontSize: 12, color: '#4a4a64', marginTop: 32 }}>
-          We The People 39120 · Built by KlickifyAgency.com
-        </p>
+        <p style={{textAlign:'center',fontSize:12,color:C.textMuted,marginTop:8}}>We The People 39120 · Built by KlickifyAgency.com</p>
       </div>
     </div>
   );

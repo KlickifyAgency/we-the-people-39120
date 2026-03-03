@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MapPin, List, Plus, User } from 'lucide-react';
+import { MapPin, List, User } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/map',     label: 'Map',     Icon: MapPin },
   { href: '/feed',    label: 'Feed',    Icon: List   },
-  { href: '/report',  label: 'Report',  Icon: Plus   },
+  { href: '/report',  label: 'Report',  Icon: null   },
   { href: '/profile', label: 'Profile', Icon: User   },
 ];
 
@@ -24,11 +24,10 @@ export function BottomNav() {
             style={{textDecoration:'none'}}>
             {isReport ? (
               <div style={{width:44,height:44,borderRadius:14,background:'#1A5EA8',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:2,boxShadow:'0 4px 12px rgba(26,94,168,0.35)'}}>
-                <Icon size={22} strokeWidth={2.5} color="#fff" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               </div>
             ) : (
-              <Icon size={22} strokeWidth={isActive ? 2.5 : 2}
-                style={{color: isActive ? '#1A5EA8' : '#94A3B8', transition:'color 0.15s'}} />
+              Icon ? <Icon size={22} strokeWidth={isActive ? 2.5 : 2} style={{color: isActive ? '#1A5EA8' : '#94A3B8', transition:'color 0.15s'}} /> : null
             )}
             <span style={{fontSize:10,fontWeight:isActive?700:600,color:isReport?'#1A5EA8':isActive?'#1A5EA8':'#94A3B8',transition:'color 0.15s'}}>{label}</span>
           </Link>
