@@ -63,9 +63,10 @@ export async function POST(req: NextRequest) {
     photo_url = urlData.publicUrl;
   }
 
+  const respondToken = crypto.randomUUID();
   const { data: report, error } = await supabase
     .from('reports')
-    .insert({ category, lat, lng, description, anonymous, photo_url, status: 'pending' })
+    .insert({ category, lat, lng, description, anonymous, photo_url, status: 'pending', respond_token: respondToken })
     .select('*, ward:wards(ward_number)')
     .single();
 
@@ -82,6 +83,7 @@ export async function POST(req: NextRequest) {
         lat, lng, reportId: report.id,
         photoUrl: photo_url ?? undefined,
         isAnonymous: anonymous,
+        respondToken,
       });
     } else {
       await sendAldermanNotification({
@@ -92,6 +94,7 @@ export async function POST(req: NextRequest) {
         lat, lng, reportId: report.id,
         photoUrl: photo_url ?? undefined,
         isAnonymous: anonymous,
+        respondToken,
       });
     }
   } catch (emailErr) {
