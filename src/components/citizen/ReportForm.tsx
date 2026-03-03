@@ -174,10 +174,23 @@ export function ReportForm() {
         <button onClick={goBack} style={{width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',borderRadius:12,background:C.blueSoft,border:`1px solid ${C.border}`,cursor:'pointer'}}>
           <ChevronLeft size={20} color={C.blue} />
         </button>
-        <div>
+        <div style={{flex:1}}>
           <div style={{fontSize:17,fontWeight:800,color:C.textMain}}>Report an Issue</div>
           <div style={{fontSize:12,color:C.textMuted}}>Step {STEPS.indexOf(step) + 1} of {STEPS.length}</div>
         </div>
+        {step !== 'confirm' && (
+          <button onClick={goNext} disabled={step === 'category' && !category}
+            style={{display:'flex',alignItems:'center',gap:6,height:40,paddingLeft:16,paddingRight:16,borderRadius:12,fontWeight:800,fontSize:15,color:C.white,background:C.blue,border:'none',cursor:'pointer',opacity:step==='category'&&!category?0.4:1,boxShadow:'0 2px 10px rgba(26,94,168,0.3)'}}>
+            Next <ChevronRight size={18} />
+          </button>
+        )}
+        {step === 'confirm' && (
+          <button onClick={handleSubmit} disabled={submitting || !category}
+            style={{display:'flex',alignItems:'center',gap:6,height:40,paddingLeft:16,paddingRight:16,borderRadius:12,fontWeight:800,fontSize:15,color:C.white,background:C.green,border:'none',cursor:'pointer',opacity:submitting||!category?0.5:1,boxShadow:'0 2px 10px rgba(45,122,79,0.3)'}}>
+            {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
+            {submitting ? 'Sending…' : 'Submit'}
+          </button>
+        )}
       </div>
 
       {/* Progress bar */}
@@ -389,30 +402,13 @@ export function ReportForm() {
 
       </div>
 
-      {/* Bottom actions */}
-      <div style={{padding:'12px 16px',flexShrink:0,borderTop:`1px solid ${C.border}`,background:C.white}}>
-        {step === 'photo' && !photoPreview && (
-          <button onClick={goNext} style={{width:'100%',height:44,borderRadius:12,fontWeight:600,fontSize:14,color:C.textSub,background:C.bg,border:`1px solid ${C.border}`,cursor:'pointer',marginBottom:10}}>
-            Skip — report without photo
+      {((step === 'photo' && !photoPreview) || (step === 'location' && !loc.lat)) && (
+        <div style={{padding:'12px 16px',flexShrink:0,borderTop:`1px solid ${C.border}`,background:C.white,paddingBottom:'calc(env(safe-area-inset-bottom) + 12px)'}}>
+          <button onClick={goNext} style={{width:'100%',height:44,borderRadius:12,fontWeight:600,fontSize:14,color:C.textMuted,background:C.bg,border:`1px solid ${C.border}`,cursor:'pointer'}}>
+            Skip this step
           </button>
-        )}
-        {step === 'location' && !loc.lat && (
-          <button onClick={goNext} style={{width:'100%',height:44,borderRadius:12,fontWeight:600,fontSize:14,color:C.textSub,background:C.bg,border:`1px solid ${C.border}`,cursor:'pointer',marginBottom:10}}>
-            Skip — continue without location
-          </button>
-        )}
-        {step === 'confirm' ? (
-          <button onClick={handleSubmit} disabled={submitting || !category}
-            style={{width:'100%',height:56,borderRadius:16,fontWeight:800,fontSize:17,color:C.white,background:C.blue,border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 4px 20px rgba(26,94,168,0.3)',opacity:submitting||!category?0.5:1}}>
-            {submitting ? <><Loader2 size={20} className="animate-spin" /> Submitting…</> : <>Submit Report</>}
-          </button>
-        ) : (
-          <button onClick={goNext} disabled={step === 'category' && !category}
-            style={{width:'100%',height:56,borderRadius:16,fontWeight:800,fontSize:17,color:C.white,background:C.blue,border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 4px 20px rgba(26,94,168,0.3)',opacity:step==='category'&&!category?0.4:1}}>
-            Continue <ChevronRight size={20} />
-          </button>
-        )}
-      </div>
+        </div>
+      )}
 
     </div>
   );
