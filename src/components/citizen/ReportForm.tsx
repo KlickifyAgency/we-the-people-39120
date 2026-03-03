@@ -385,14 +385,14 @@ export function ReportForm() {
                 </div>
               </div>
             </div>
-            {photoPreview && (
-              <img src={photoPreview} alt="Report photo" style={{width:'100%',objectFit:'cover',maxHeight:200,display:'block'}} />
-            )}
             {description && (
-              <div style={{padding:'14px 16px',borderTop:`1px solid ${C.border}`}}>
+              <div style={{padding:'14px 16px',borderBottom:`1px solid ${C.border}`}}>
                 <div style={{fontSize:11,fontWeight:700,color:C.textMuted,textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:4}}>Description</div>
                 <div style={{fontSize:14,color:C.textSub,lineHeight:1.6}}>{description}</div>
               </div>
+            )}
+            {photoPreview && (
+              <img src={photoPreview} alt="Report photo" style={{width:'100%',objectFit:'cover',maxHeight:200,display:'block'}} />
             )}
             <div style={{padding:'12px 16px',borderTop:`1px solid ${C.border}`,background:C.bg}}>
               <div style={{fontSize:13,color:C.textMuted}}>{anonymous ? '🔒 Posted anonymously' : '👤 Posted with your profile'}</div>

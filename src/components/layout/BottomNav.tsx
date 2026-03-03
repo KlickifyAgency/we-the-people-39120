@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import { MapPin, List, User } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { href: '/map',     label: 'Map',     Icon: MapPin },
   { href: '/feed',    label: 'Feed',    Icon: List   },
   { href: '/report',  label: 'Report',  Icon: null   },
   { href: '/profile', label: 'Profile', Icon: User   },

@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  console.log('Report created with token:', report.id, 'token:', report.respond_token ?? 'NO TOKEN SAVED');
   return NextResponse.json(data ?? []);
 }
 
@@ -71,6 +72,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  console.log('Report created with token:', report.id, 'token:', report.respond_token ?? 'NO TOKEN SAVED');
 
   try {
     const wardInfo = detectWardServer(lat, lng);
@@ -121,7 +123,7 @@ export async function POST(req: NextRequest) {
       await fetch(makeUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, photo_url, report_url: reportUrl, category: label, ward: `Ward ${wardNum}` }),
+        body: JSON.stringify({ message, photo_url: photo_url ?? null, image_url: photo_url ?? null, report_url: reportUrl, category: label, ward: `Ward ${wardNum}`, has_photo: !!photo_url }),
       }).catch(e => console.error('Make webhook failed:', e));
     }
   } catch (fbErr) {

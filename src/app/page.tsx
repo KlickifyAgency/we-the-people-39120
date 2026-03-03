@@ -141,6 +141,20 @@ export default function HomePage() {
         </div>
       </div>
 
+      <div style={{margin:'0 20px 24px',padding:'20px 22px',background:C.blueSoft,borderRadius:16,border:`1px solid #C3D4EE`}}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
+          <div style={{width:38,height:38,borderRadius:10,background:C.blue,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h2 style={{fontSize:18,fontWeight:900,color:C.textMain,margin:0}}>Create Your Profile</h2>
+        </div>
+        <p style={{fontSize:15,lineHeight:1.75,color:C.textSub,marginBottom:12}}>When you create a free profile, you can <strong style={{color:C.textMain}}>track every report you submit</strong> — see its status, how many neighbors support it, and get notified the moment your alderman responds.</p>
+        <p style={{fontSize:14,lineHeight:1.65,color:C.textSub,marginBottom:16}}>Your profile also builds your civic reputation. The more you participate, the more your voice matters in the community record.</p>
+        <Link href="/profile" style={{display:'block',textAlign:'center',lineHeight:'52px',background:C.blue,color:'white',fontWeight:800,fontSize:16,height:52,borderRadius:14,textDecoration:'none',boxShadow:'0 4px 16px rgba(26,94,168,0.3)'}}>
+          Create Your Free Profile
+        </Link>
+      </div>
+
       <div style={{margin:'0 20px',padding:'20px',background:C.white,borderRadius:16,border:`1px solid ${C.border}`,textAlign:'center'}}>
         <div style={{display:'flex',flexWrap:'wrap',gap:16,justifyContent:'center',marginBottom:14}}>
           <Link href="/map" style={{fontSize:14,color:C.blue,fontWeight:700,textDecoration:'none'}}>Public Map</Link>
