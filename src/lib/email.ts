@@ -85,7 +85,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 <body>
 <div class="wrap"><div class="card">
   <div class="hdr">
-    <img src="${appUrl}/logo-wtp.png" alt="We The People 39120" />
+    <img src="https://we-the-people-39120.vercel.app/logo-wtp.png" alt="We The People 39120" style="height:80px;display:block;margin:0 auto" />
     <h1>New Civic Report Filed<br/>for Ward ${data.wardNumber}</h1>
     <p>Report #${data.reportId.slice(0,8).toUpperCase()} &nbsp;&middot;&nbsp; Natchez, MS 39120</p>
   </div>

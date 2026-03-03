@@ -44,9 +44,8 @@ export default function AdminDashboard(){
     if(!fbMsg.trim()){setFbResult('Please write a message first.');return;}
     setFbPosting(true);setFbResult('');
     try{
-      const makeUrl=process.env.NEXT_PUBLIC_MAKE_WEBHOOK_URL??'';
-      if(!makeUrl){setFbResult('Make webhook URL not configured.');setFbPosting(false);return;}
-      await fetch(makeUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:fbMsg,photo_url:null,report_url:'',category:'Admin Post',ward:'All Wards',has_photo:false})});
+      const res=await fetch('/api/v1/facebook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:fbMsg,photo_url:null})});
+      if(!res.ok){const e=await res.json();setFbResult('❌ '+( e.error||'Failed'));setFbPosting(false);return;}
       setFbResult('✅ Posted to Facebook successfully!');setFbMsg('');
     }catch(e){setFbResult('❌ Failed to post. Check webhook URL.');}
     setFbPosting(false);
