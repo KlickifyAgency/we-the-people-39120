@@ -1,0 +1,43 @@
+{
+  "name": "we-the-people-39120",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "deploy": "next build && vercel --prod",
+    "db:migrate": "echo 'Run supabase/migrations/001_initial_schema.sql in Supabase SQL Editor'",
+    "db:seed": "echo 'Run supabase/seed/aldermen.sql then scripts/seed-wards.sql in Supabase SQL Editor'"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.97.0",
+    "@tanstack/react-query": "^5.90.21",
+    "@turf/turf": "^7.3.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.34.3",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.575.0",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-leaflet": "^5.0.0",
+    "resend": "^6.9.2",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "sharp": "^0.34.5",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

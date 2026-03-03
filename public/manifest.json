@@ -1,0 +1,21 @@
+{
+  "name": "We The People 39120",
+  "short_name": "WTP 39120",
+  "description": "We See It. We Report It. We Fix It Together — Civic reporting for Natchez, Mississippi",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1A5EA8",
+  "theme_color": "#1A5EA8",
+  "categories": ["utilities", "social"],
+  "lang": "en-US",
+  "icons": [
+    {"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/icons/icon-180.png", "sizes": "180x180", "type": "image/png"}
+  ],
+  "shortcuts": [
+    {"name": "Report Issue", "short_name": "Report", "description": "Report a neighborhood issue", "url": "/report", "icons": [{"src": "/icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "Community Feed", "short_name": "Feed", "description": "See community reports", "url": "/feed", "icons": [{"src": "/icons/icon-192.png", "sizes": "192x192"}]}
+  ]
+}
