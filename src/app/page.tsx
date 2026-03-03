@@ -58,9 +58,9 @@ export default function HomePage() {
           <span style={{color:'#1877F2',fontWeight:800,fontSize:15}}>Follow us on Facebook</span>
         </div>
         <p style={{fontSize:14,color:C.textSub,marginBottom:14,lineHeight:1.5}}>Every new report is shared publicly on our Facebook page. Stay informed and help spread the word.</p>
-        <a href={FB_PAGE} target="_blank" rel="noopener noreferrer" style={{display:'inline-flex',alignItems:'center',gap:8,background:'#1877F2',color:C.white,fontWeight:700,fontSize:15,padding:'12px 24px',borderRadius:12,textDecoration:'none',boxShadow:'0 4px 14px rgba(24,119,242,0.3)'}}>
-          <svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-          We The People 39120 on Facebook
+        <a href={FB_PAGE} target="_blank" rel="noopener noreferrer" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:14,background:'#1877F2',color:C.white,fontWeight:800,fontSize:17,padding:'16px 24px',borderRadius:14,textDecoration:'none',boxShadow:'0 4px 14px rgba(24,119,242,0.3)'}}>
+          <svg viewBox="0 0 24 24" fill="white" width="30" height="30"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <span>We The People 39120 on Facebook</span>
         </a>
       </div>
 
