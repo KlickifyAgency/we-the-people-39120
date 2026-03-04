@@ -5,7 +5,6 @@ import { CheckCircle2, Loader2, ShieldCheck, AlertTriangle } from 'lucide-react'
 const C = { bg:'#F7F9FC',white:'#FFFFFF',border:'#DDE3EC',blue:'#1A5EA8',blueSoft:'#EBF2FB',green:'#2D7A4F',greenSoft:'#E8F5EE',textMain:'#0F172A',textSub:'#475569',textMuted:'#94A3B8',danger:'#DC2626',dangerSoft:'#FEE2E2' };
 const LABELS: Record<string,string> = { graffiti:'Graffiti / Vandalism',dumping:'Illegal Dumping',abandoned_vehicle:'Abandoned Vehicle',property_neglect:'Property Neglect',noise:'Noise Complaint',street_issues:'Street / Pothole Issues',vegetation:'Overgrown Vegetation',animal:'Animal Issues',safety_hazard:'Safety Hazard',water_drainage:'Water / Drainage Problem',public_safety:'Public Safety Concern' };
 const ALDERMEN: Record<number,string> = {1:'Valencia Hall',2:'Billie Joe Frazier',3:'Sarah Carter-Smith',4:'Felicia Bridgewater-Irving',5:'Benjamin Davis',6:'Curtis Moroney'};
-const ALDERMEN: Record<number,string> = {1:'Valencia Hall',2:'Billie Joe Frazier',3:'Sarah Carter-Smith',4:'Felicia Bridgewater-Irving',5:'Benjamin Davis',6:'Curtis Moroney'};
 export default function RespondPage() {
   const params = useParams();
   const token = params?.token as string;
