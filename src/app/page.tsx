@@ -150,9 +150,14 @@ export default function HomePage() {
         </div>
         <p style={{fontSize:15,lineHeight:1.75,color:C.textSub,marginBottom:12}}>When you create a free profile, you can <strong style={{color:C.textMain}}>track every report you submit</strong> — see its status, how many neighbors support it, and get notified the moment your alderman responds.</p>
         <p style={{fontSize:14,lineHeight:1.65,color:C.textSub,marginBottom:16}}>Your profile also builds your civic reputation. The more you participate, the more your voice matters in the community record.</p>
-        <Link href="/profile" style={{display:'block',textAlign:'center',lineHeight:'52px',background:C.blue,color:'white',fontWeight:800,fontSize:16,height:52,borderRadius:14,textDecoration:'none',boxShadow:'0 4px 16px rgba(26,94,168,0.3)'}}>
-          Create Your Free Profile
-        </Link>
+        <div style={{display:'flex',gap:10}}>
+          <Link href="/profile" style={{flex:1,display:'block',textAlign:'center',lineHeight:'52px',background:C.blue,color:'white',fontWeight:800,fontSize:16,height:52,borderRadius:14,textDecoration:'none',boxShadow:'0 4px 16px rgba(26,94,168,0.3)'}}>
+            Create Profile
+          </Link>
+          <Link href="/leaderboard" style={{flex:1,display:'block',textAlign:'center',lineHeight:'52px',background:C.green,color:'white',fontWeight:800,fontSize:16,height:52,borderRadius:14,textDecoration:'none',boxShadow:'0 4px 16px rgba(45,122,79,0.3)'}}>
+            🏆 Leaderboard
+          </Link>
+        </div>
       </div>
 
       <div style={{margin:'0 20px',padding:'20px',background:C.white,borderRadius:16,border:`1px solid ${C.border}`,textAlign:'center'}}>
