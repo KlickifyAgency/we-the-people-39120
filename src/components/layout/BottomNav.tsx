@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MapPin, List, User } from 'lucide-react';
+import { List, User, Home } from 'lucide-react';
 
 const NAV_ITEMS = [
+  { href: '/',        label: 'Home',    Icon: Home   },
   { href: '/feed',    label: 'Feed',    Icon: List   },
   { href: '/report',  label: 'Report',  Icon: null   },
   { href: '/profile', label: 'Profile', Icon: User   },
@@ -16,7 +17,7 @@ export function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex max-w-lg mx-auto"
       style={{background:'#FFFFFF',borderTop:'1px solid #DDE3EC',paddingBottom:'env(safe-area-inset-bottom)',boxShadow:'0 -2px 12px rgba(0,0,0,0.06)'}}>
       {NAV_ITEMS.map(({ href, label, Icon }) => {
-        const isActive = pathname === href || (href !== '/' && pathname.startsWith(href));
+        const isActive = href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href);
         const isReport = href === '/report';
         return (
           <Link key={href} href={href} className="flex-1 flex flex-col items-center justify-center gap-1 py-3"

@@ -85,7 +85,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 <body>
 <div class="wrap"><div class="card">
   <div class="hdr">
-    <img src="https://we-the-people-39120.vercel.app/logo-wtp.png" alt="We The People 39120" style="height:80px;display:block;margin:0 auto" />
+    <div style="text-align:center;margin-bottom:4px"><span style="font-size:30px;font-weight:900;color:#ffffff;font-family:Georgia,serif">We The People</span><br/><span style="font-size:24px;font-weight:900;color:#ffffff;letter-spacing:4px;font-family:Georgia,serif">39120</span></div>
     <h1>New Civic Report Filed<br/>for Ward ${data.wardNumber}</h1>
     <p>Report #${data.reportId.slice(0,8).toUpperCase()} &nbsp;&middot;&nbsp; Natchez, MS 39120</p>
   </div>
