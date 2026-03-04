@@ -34,13 +34,6 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  // Award points to user if not anonymous
-  if (userId) {
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'https://we-the-people-39120.vercel.app'}/api/v1/points`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, action: 'report_submitted' })
-    }).catch(() => {});
-  }
   return NextResponse.json(data ?? []);
 }
 
@@ -131,9 +124,11 @@ export async function POST(req: NextRequest) {
         public_safety: 'Public Safety',
       };
       const label = LABELS[category] ?? category;
+      const ALDERMEN: Record<number,string> = {1:'Valencia Hall',2:'Billie Joe Frazier',3:'Sarah Carter-Smith',4:'Felicia Bridgewater-Irving',5:'Benjamin Davis',6:'Curtis Moroney'};
       const wardNum = report.ward?.ward_number ?? detectWardServer(lat, lng)?.ward ?? '?';
+      const aldermanName = ALDERMEN[Number(wardNum)] ?? 'Your Alderman';
       const reportUrl = `https://we-the-people-39120.vercel.app/report/${report.id}`;
-      const message = `🚨 NEW REPORT — ${label.toUpperCase()}\n\n📍 Ward ${wardNum} — Natchez, MS 39120${description ? `\n\n"${description.slice(0, 200)}${description.length > 200 ? '...' : ''}"` : ''}\n\n⏱️ The alderman has 30 days to respond publicly.\n👉 View & support this report: ${reportUrl}\n\n#WeThePeople39120 #Natchez #NatchezMS #Ward${wardNum} #Mississippi`;
+      const message = `🚨 NEW REPORT — ${label.toUpperCase()}\n\n📍 Ward ${wardNum} — Natchez, MS 39120\n🏛️ Alderman: ${aldermanName}${description ? `\n\n"${description.slice(0, 200)}${description.length > 200 ? '...' : ''}"` : ''}\n\n⏱️ ${aldermanName} has 30 days to respond publicly.\n👉 View & support this report: ${reportUrl}\n\n#WeThePeople39120 #Natchez #NatchezMS #Ward${wardNum} #Mississippi`;
       await fetch(makeUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
