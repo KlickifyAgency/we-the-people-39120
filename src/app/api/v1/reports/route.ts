@@ -53,6 +53,8 @@ export async function POST(req: NextRequest) {
   const description = (formData.get('description') as string) || null;
   const anonymous   = formData.get('anonymous') === 'true';
   const photoFile   = formData.get('photo') as File | null;
+  const { data: { user } } = await supabase.auth.getUser();
+  const userId = user?.id ?? null;
 
   if (!category || isNaN(lat) || isNaN(lng)) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
