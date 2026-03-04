@@ -44,7 +44,7 @@ export default function AdminDashboard(){
     if(!fbMsg.trim()){setFbResult('Please write a message first.');return;}
     setFbPosting(true);setFbResult('');
     try{
-      const res=await fetch('/api/v1/facebook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:fbMsg,photo_url:null})});
+      const res=await fetch('/api/v1/facebook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:fbMsg,photo_url:null,ward:'All Wards'})});
       if(!res.ok){const e=await res.json();setFbResult('❌ '+( e.error||'Failed'));setFbPosting(false);return;}
       setFbResult('✅ Posted to Facebook successfully!');setFbMsg('');
     }catch(e){setFbResult('❌ Failed to post. Check webhook URL.');}
@@ -115,7 +115,7 @@ export default function AdminDashboard(){
         </div>
         <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:20}}>
           <div style={{fontSize:13,fontWeight:700,color:'rgba(255,255,255,0.5)',marginBottom:12,textTransform:'uppercase',letterSpacing:'0.08em'}}>Quick Post — Recent Reports</div>
-          <div style={{display:'flex',flexDirection:'column',gap:8}}>{reports.slice(0,5).map(r=><div key={r.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',background:'rgba(255,255,255,0.03)',borderRadius:10,border:'1px solid rgba(255,255,255,0.06)'}}><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:700,color:'#fff'}}>{CAT_LABELS[r.category]??r.category}</div><div style={{fontSize:11,color:'rgba(255,255,255,0.4)'}}>Ward {r.ward_number} · {new Date(r.created_at).toLocaleDateString()}</div></div><button onClick={()=>setFbMsg(`🚨 COMMUNITY ALERT — ${(CAT_LABELS[r.category]??r.category).toUpperCase()}\n\n📍 Ward ${r.ward_number} — Natchez, MS 39120${r.description?`\n\n"${r.description.slice(0,200)}"`:''}\n\n⏱️ The alderman has 30 days to respond publicly.\n👉 View this report: https://we-the-people-39120.vercel.app/report/${r.id}\n\n#WeThePeople39120 #Natchez #NatchezMS`)} style={{padding:'6px 14px',borderRadius:8,background:'rgba(24,119,242,0.2)',border:'1px solid rgba(24,119,242,0.4)',color:'#60a5fa',fontSize:12,cursor:'pointer',fontWeight:700,flexShrink:0}}>Use This</button></div>)}</div>
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>{reports.slice(0,5).map(r=><div key={r.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',background:'rgba(255,255,255,0.03)',borderRadius:10,border:'1px solid rgba(255,255,255,0.06)'}}><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:700,color:'#fff'}}>{CAT_LABELS[r.category]??r.category}</div><div style={{fontSize:11,color:'rgba(255,255,255,0.4)'}}>Ward {r.ward_number} · {new Date(r.created_at).toLocaleDateString()}</div></div><button onClick={()=>setFbMsg(`🚨 COMMUNITY ALERT — ${(CAT_LABELS[r.category]??r.category).toUpperCase()}\n\n📍 Ward ${r.ward_number??'Unknown'} — Natchez, MS 39120${r.description?`\n\n"${r.description.slice(0,200)}"`:''}\n\n⏱️ The alderman has 30 days to respond publicly.\n👉 View this report: https://we-the-people-39120.vercel.app/report/${r.id}\n\n#WeThePeople39120 #Natchez #NatchezMS`)} style={{padding:'6px 14px',borderRadius:8,background:'rgba(24,119,242,0.2)',border:'1px solid rgba(24,119,242,0.4)',color:'#60a5fa',fontSize:12,cursor:'pointer',fontWeight:700,flexShrink:0}}>Use This</button></div>)}</div>
         </div>
       </div>}
     </div>
