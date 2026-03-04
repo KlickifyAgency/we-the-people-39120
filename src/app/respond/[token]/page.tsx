@@ -1,9 +1,12 @@
 'use client';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CheckCircle2, Loader2, ShieldCheck, AlertTriangle } from 'lucide-react';
 const C = { bg:'#F7F9FC',white:'#FFFFFF',border:'#DDE3EC',blue:'#1A5EA8',blueSoft:'#EBF2FB',green:'#2D7A4F',greenSoft:'#E8F5EE',textMain:'#0F172A',textSub:'#475569',textMuted:'#94A3B8',danger:'#DC2626',dangerSoft:'#FEE2E2' };
 const LABELS: Record<string,string> = { graffiti:'Graffiti / Vandalism',dumping:'Illegal Dumping',abandoned_vehicle:'Abandoned Vehicle',property_neglect:'Property Neglect',noise:'Noise Complaint',street_issues:'Street / Pothole Issues',vegetation:'Overgrown Vegetation',animal:'Animal Issues',safety_hazard:'Safety Hazard',water_drainage:'Water / Drainage Problem',public_safety:'Public Safety Concern' };
-export default function RespondPage({ params }: { params: { token: string } }) {
+export default function RespondPage() {
+  const params = useParams();
+  const token = params?.token as string;
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [invalid, setInvalid] = useState(false);
@@ -12,7 +15,8 @@ export default function RespondPage({ params }: { params: { token: string } }) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
-    fetch(`/api/v1/respond?token=${params.token}`)
+    if (!token) return;
+    fetch(`/api/v1/respond?token=${token}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!data) setInvalid(true);
@@ -20,19 +24,19 @@ export default function RespondPage({ params }: { params: { token: string } }) {
         setLoading(false);
       })
       .catch(() => { setInvalid(true); setLoading(false); });
-  }, [params.token]);
+  }, [token]);
   const handleSubmit = async () => {
     if (!response.trim()) { setError('Please write a response before submitting.'); return; }
     setSubmitting(true);
     const res = await fetch('/api/v1/respond', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: params.token, response }),
+      body: JSON.stringify({ token, response }),
     });
     if (!res.ok) { setError('Something went wrong. Please try again.'); setSubmitting(false); return; }
     setSubmitted(true); setSubmitting(false);
   };
-  if (loading) return <div style={{minHeight:'100vh',background:C.bg,display:'flex',alignItems:'center',justifyContent:'center'}}><Loader2 size={40} color={C.blue} className="animate-spin" /></div>;
+  if (loading) return <div style={{minHeight:'100vh',background:C.bg,display:'flex',alignItems:'center',justifyContent:'center'}}><Loader2 size={40} color={C.blue} /></div>;
   if (invalid) return (
     <div style={{minHeight:'100vh',background:C.bg,display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
       <div style={{maxWidth:400,textAlign:'center'}}>
@@ -55,23 +59,26 @@ export default function RespondPage({ params }: { params: { token: string } }) {
   return (
     <div style={{minHeight:'100vh',background:C.bg,paddingBottom:60,fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'}}>
       <div style={{background:'linear-gradient(135deg,#1A5EA8,#2D7A4F)',padding:'36px 24px 28px',textAlign:'center'}}>
-        <img src="https://we-the-people-39120.vercel.app/logo-wtp.png" alt="We The People 39120" style={{height:70,objectFit:'contain',marginBottom:16,display:'block',marginLeft:'auto',marginRight:'auto'}} />
+        <div style={{textAlign:'center',marginBottom:16}}>
+          <span style={{fontSize:28,fontWeight:900,color:'#ffffff',fontFamily:'Georgia,serif'}}>We The People</span><br/>
+          <span style={{fontSize:22,fontWeight:900,color:'#ffffff',letterSpacing:4,fontFamily:'Georgia,serif'}}>39120</span>
+        </div>
         <div style={{display:'inline-flex',alignItems:'center',gap:8,background:'rgba(255,255,255,0.15)',borderRadius:100,padding:'6px 16px',marginBottom:12}}>
           <ShieldCheck size={16} color="white" />
           <span style={{color:'white',fontWeight:700,fontSize:13}}>Official Alderman Portal — Private</span>
         </div>
-        <h1 style={{color:'white',fontSize:20,fontWeight:800,lineHeight:1.4}}>Post Your Official Response<br/>to Ward {report.ward_number}</h1>
+        <h1 style={{color:'white',fontSize:20,fontWeight:800,lineHeight:1.4}}>Post Your Official Response<br/>to Ward {report?.ward_number}</h1>
       </div>
       <div style={{maxWidth:560,margin:'0 auto',padding:'24px 20px'}}>
         <div style={{background:C.white,borderRadius:16,border:`1px solid ${C.border}`,overflow:'hidden',marginBottom:20}}>
           <div style={{padding:'12px 16px',background:C.blueSoft,borderBottom:`1px solid ${C.border}`}}><span style={{fontSize:11,fontWeight:800,color:C.blue,textTransform:'uppercase',letterSpacing:'0.08em'}}>Report Summary</span></div>
-          {[['Issue',LABELS[report.category]??report.category],['Ward',`Ward ${report.ward_number} — Natchez, MS`],['Filed',new Date(report.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})],['Status',report.status??'Pending Response']].map(([label,value])=>(
+          {[['Issue',LABELS[report?.category]??report?.category],['Ward',`Ward ${report?.ward_number} — Natchez, MS`],['Filed',report?.created_at?new Date(report.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}):'-'],['Status',report?.status??'Pending']].map(([label,value])=>(
             <div key={label} style={{display:'flex',padding:'12px 16px',borderBottom:`1px solid ${C.border}`}}>
               <div style={{fontSize:11,fontWeight:800,color:C.textMuted,textTransform:'uppercase',letterSpacing:'0.06em',minWidth:80}}>{label}</div>
               <div style={{fontSize:14,fontWeight:600,color:C.textMain,flex:1}}>{value}</div>
             </div>
           ))}
-          {report.description&&<div style={{padding:'12px 16px'}}><div style={{fontSize:11,fontWeight:800,color:C.textMuted,textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:6}}>Description</div><p style={{fontSize:14,color:C.textSub,lineHeight:1.7,fontStyle:'italic'}}>"{report.description}"</p></div>}
+          {report?.description&&<div style={{padding:'12px 16px'}}><div style={{fontSize:11,fontWeight:800,color:C.textMuted,textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:6}}>Description</div><p style={{fontSize:14,color:C.textSub,lineHeight:1.7,fontStyle:'italic'}}>"{report.description}"</p></div>}
         </div>
         <div style={{background:'#FEF3C7',border:'1px solid #FCD34D',borderRadius:12,padding:'14px 16px',marginBottom:20,display:'flex',gap:10,alignItems:'flex-start'}}>
           <ShieldCheck size={18} color="#92400E" style={{flexShrink:0,marginTop:2}} />
@@ -87,7 +94,7 @@ export default function RespondPage({ params }: { params: { token: string } }) {
         </div>
         <button onClick={handleSubmit} disabled={submitting||!response.trim()}
           style={{width:'100%',height:58,borderRadius:16,fontWeight:800,fontSize:17,color:'white',background:C.green,border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 4px 20px rgba(45,122,79,0.3)',opacity:submitting||!response.trim()?0.5:1}}>
-          {submitting?<><Loader2 size={20} className="animate-spin" />Publishing…</>:<>Publish Official Response</>}
+          {submitting?'Publishing…':'Publish Official Response'}
         </button>
       </div>
     </div>
