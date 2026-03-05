@@ -1,5 +1,4 @@
 import { Header } from '@/components/layout/Header';
-import { FloatingActionButton } from '@/components/layout/FloatingActionButton';
 import { PublicFeed } from '@/components/citizen/PublicFeed';
 
 export default function FeedPage() {
@@ -9,7 +8,6 @@ export default function FeedPage() {
       <div className="h-[calc(100vh-8rem)]">
         <PublicFeed />
       </div>
-      <FloatingActionButton />
     </>
   );
 }
