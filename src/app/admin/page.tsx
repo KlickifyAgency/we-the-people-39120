@@ -28,12 +28,12 @@ export default function AdminDashboard(){
   const supabase=createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
   const load=useCallback(async()=>{
     setLoading(true);
-    const [{data:rData},{data:uData}]=await Promise.all([
+    const [rResp, uResp]=await Promise.all([
       supabase.from('reports').select('*').order('created_at',{ascending:false}),
-      fetch('/api/v1/admin/users').then(r=>r.json()).then(data=>{ if(Array.isArray(data)) setUsers(data); })
+      fetch('/api/v1/admin/users').then(r=>r.json()).catch(()=>[])
     ]);
-    setReports(rData??[]);
-    setUsers(uData??[]);
+    setReports(rResp.data??[]);
+    setUsers(Array.isArray(uResp)?uResp:[]);
     setLoading(false);
   },[]);
   useEffect(()=>{if(auth)load();},[auth,load]);
@@ -65,7 +65,7 @@ export default function AdminDashboard(){
   return(<div style={{minHeight:'100vh',background:'#060610',color:'#fff',fontFamily:'system-ui',paddingBottom:40}}>
     <div style={{borderBottom:'1px solid rgba(255,255,255,0.07)',padding:'16px 24px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50,background:'rgba(6,6,16,0.95)',backdropFilter:'blur(20px)'}}>
       <div style={{display:'flex',alignItems:'center',gap:12}}><div style={{width:38,height:38,borderRadius:10,background:'linear-gradient(135deg,#1A5EA8,#2D7A4F)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20}}>🏛️</div><div><div style={{fontWeight:900,fontSize:16}}>WTP 39120 Admin</div><div style={{fontSize:11,color:'rgba(255,255,255,0.4)'}}>Natchez, Mississippi</div></div></div>
-      <div style={{display:'flex',gap:8}}><button onClick={()=>{setLoading(true);loadData();}} style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8,color:'rgba(255,255,255,0.6)',fontSize:12,padding:'6px 14px',cursor:'pointer',fontWeight:600}}>↺ Refresh</button><button onClick={()=>setAuth(false)} style={{background:'rgba(248,113,113,0.12)',border:'1px solid rgba(248,113,113,0.25)',borderRadius:8,color:'#f87171',fontSize:12,padding:'6px 14px',cursor:'pointer',fontWeight:600}}>Sign Out</button></div>
+      <div style={{display:'flex',gap:8}}><button onClick={load} style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8,color:'rgba(255,255,255,0.6)',fontSize:12,padding:'6px 14px',cursor:'pointer',fontWeight:600}}>↺ Refresh</button><button onClick={()=>setAuth(false)} style={{background:'rgba(248,113,113,0.12)',border:'1px solid rgba(248,113,113,0.25)',borderRadius:8,color:'#f87171',fontSize:12,padding:'6px 14px',cursor:'pointer',fontWeight:600}}>Sign Out</button></div>
     </div>
     <div style={{display:'flex',gap:4,padding:'16px 24px 0',overflowX:'auto'}}>{TABS.map(t=>(<button key={t.id} onClick={()=>setTab(t.id as any)} style={{padding:'8px 18px',borderRadius:10,border:'none',cursor:'pointer',fontWeight:700,fontSize:13,whiteSpace:'nowrap',background:tab===t.id?'linear-gradient(135deg,#1A5EA8,#2D7A4F)':'rgba(255,255,255,0.04)',color:tab===t.id?'#fff':'rgba(255,255,255,0.5)'}}>{t.icon} {t.label}</button>))}</div>
     <div style={{padding:24}}>
