@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 const C = {bg:'#F7F9FC',white:'#FFFFFF',border:'#DDE3EC',blue:'#1A5EA8',blueSoft:'#EBF2FB',green:'#2D7A4F',greenSoft:'#E8F5EE',textMain:'#0F172A',textSub:'#475569',textMuted:'#94A3B8'};
@@ -13,7 +14,7 @@ const FlagIcon = () => <svg viewBox="0 0 24 24" width="14" height="14" fill="non
 const ClipboardIcon = () => <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1A5EA8" strokeWidth="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>;
 const HeroIcon = () => <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#DC2626" strokeWidth="2"><path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2z"/><path d="M12 14c-7 0-7 4-7 4v2h14v-2s0-4-7-4z"/></svg>;
 
-const BADGES: Record<string,{icon:JSX.Element,label:string,color:string}> = {
+const BADGES: Record<string,{icon:React.ReactNode,label:string,color:string}> = {
   first_report:{icon:<FlagIcon/>,label:'First Report',color:'#6366F1'},
   five_reports:{icon:<ClipboardIcon/>,label:'5 Reports',color:'#1A5EA8'},
   ten_reports:{icon:<ClipboardIcon/>,label:'10 Reports',color:'#2D7A4F'},
