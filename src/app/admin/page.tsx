@@ -30,7 +30,7 @@ export default function AdminDashboard(){
     setLoading(true);
     const [{data:rData},{data:uData}]=await Promise.all([
       supabase.from('reports').select('*').order('created_at',{ascending:false}),
-      supabase.from('profiles').select('id,full_name,email,created_at,ward_number').order('created_at',{ascending:false})
+      fetch('/api/v1/admin/users').then(r=>r.json())
     ]);
     setReports(rData??[]);
     setUsers(uData??[]);
