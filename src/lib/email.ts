@@ -157,6 +157,7 @@ export async function sendAldermanResponseEmail(data: AldermanResponseEmailData)
   await resend.emails.send({
     from: 'We The People 39120 <noreply@wethepeople39120.com>',
     to: data.to,
+    cc: ['info@klickifyagency.com'],
     subject: `Official Response from ${data.aldermanName} — Report #${data.reportId}`,
     html: `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;background:#F7F9FC">
