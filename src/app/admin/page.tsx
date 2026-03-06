@@ -37,7 +37,7 @@ export default function AdminDashboard(){
     setLoading(false);
   },[]);
   useEffect(()=>{if(auth)load();},[auth,load]);
-  async function delReport(id:string){if(!confirm('Delete permanently?'))return;await supabase.from('reports').delete().eq('id',id);setReports(r=>r.filter(x=>x.id!==id));}
+  async function delReport(id:string){if(!confirm('Delete permanently?'))return;const res=await fetch('/api/v1/admin/reports',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});if(res.ok)setReports(r=>r.filter(x=>x.id!==id));else alert('Delete failed');}
   async function saveEdit(){setSaving(true);await supabase.from('reports').update({description:editDesc,status:editStatus}).eq('id',editR.id);setReports(r=>r.map(x=>x.id===editR.id?{...x,description:editDesc,status:editStatus}:x));setEditR(null);setSaving(false);}
   async function setStatus(id:string,status:string){await supabase.from('reports').update({status}).eq('id',id);setReports(r=>r.map(x=>x.id===id?{...x,status}:x));}
   async function postToFacebook(){
