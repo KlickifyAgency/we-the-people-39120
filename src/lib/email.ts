@@ -30,6 +30,7 @@ export interface ReportEmailData {
 }
 
 export async function sendAldermanNotification(data: ReportEmailData) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const categoryLabel = CATEGORY_LABELS[data.category] ?? data.category;
   const mapsUrl = `https://maps.google.com/?q=${data.lat},${data.lng}`;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://we-the-people-39120.vercel.app';
