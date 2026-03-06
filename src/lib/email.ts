@@ -151,8 +151,8 @@ export interface AldermanResponseEmailData {
 }
 
 export async function sendAldermanResponseEmail(data: AldermanResponseEmailData) {
-  const { Resend } = await import('resend');
-    const LABELS: Record<string,string> = { graffiti:'Graffiti / Vandalism',dumping:'Illegal Dumping',abandoned_vehicle:'Abandoned Vehicle',property_neglect:'Property Neglect',noise:'Noise Complaint',street_issues:'Street / Pothole Issues',vegetation:'Overgrown Vegetation',animal:'Animal Issues',safety_hazard:'Safety Hazard',water_drainage:'Water / Drainage Problem',public_safety:'Public Safety Concern' };
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const LABELS: Record<string,string> = { graffiti:'Graffiti / Vandalism',dumping:'Illegal Dumping',abandoned_vehicle:'Abandoned Vehicle',property_neglect:'Property Neglect',noise:'Noise Complaint',street_issues:'Street / Pothole Issues',vegetation:'Overgrown Vegetation',animal:'Animal Issues',safety_hazard:'Safety Hazard',water_drainage:'Water / Drainage Problem',public_safety:'Public Safety Concern' };
   const label = LABELS[data.category] ?? data.category;
   await resend.emails.send({
     from: 'We The People 39120 <noreply@wethepeople39120.com>',

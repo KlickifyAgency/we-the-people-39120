@@ -25,7 +25,7 @@ export default function AdminDashboard(){
   const [fbMsg,setFbMsg]=useState('');
   const [fbPosting,setFbPosting]=useState(false);
   const [fbResult,setFbResult]=useState('');
-  const supabase=createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+  const supabase=createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL||'',process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY||'');
   const load=useCallback(async()=>{
     setLoading(true);
     const [rResp, uResp]=await Promise.all([

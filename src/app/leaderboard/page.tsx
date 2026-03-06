@@ -25,7 +25,7 @@ const BADGES: Record<string,{icon:React.ReactNode,label:string,color:string}> = 
 export default function LeaderboardPage() {
   const [leaders, setLeaders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+  const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL||'', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY||'');
   useEffect(() => {
     async function load() {
       const { data: profiles } = await supabase.from('profiles').select('id,full_name,points,badges,ward_number').order('points',{ascending:false}).limit(20);
