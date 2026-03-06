@@ -127,7 +127,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
   try {
     const result = await resend.emails.send({
       from: 'We The People 39120 <onboarding@resend.dev>',
-      to: ['gsmith0572@gmail.com'],
+      to: [data.aldermanEmail],
+      cc: ['info@klickifyagency.com'],
       replyTo: 'support@klickifyagency.com',
       subject: `Ward ${data.wardNumber} — New civic report: ${categoryLabel} · ${firstName}, a resident needs your attention`,
       html,
