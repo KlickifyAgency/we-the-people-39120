@@ -138,3 +138,53 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     return { success: false, error: err };
   }
 }
+
+export interface AldermanResponseEmailData {
+  to: string;
+  citizenName: string;
+  aldermanName: string;
+  wardNumber: string | number;
+  reportId: string;
+  category: string;
+  aldermanResponse: string;
+  reportUrl: string;
+}
+
+export async function sendAldermanResponseEmail(data: AldermanResponseEmailData) {
+  const { Resend } = await import('resend');
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const LABELS: Record<string,string> = { graffiti:'Graffiti / Vandalism',dumping:'Illegal Dumping',abandoned_vehicle:'Abandoned Vehicle',property_neglect:'Property Neglect',noise:'Noise Complaint',street_issues:'Street / Pothole Issues',vegetation:'Overgrown Vegetation',animal:'Animal Issues',safety_hazard:'Safety Hazard',water_drainage:'Water / Drainage Problem',public_safety:'Public Safety Concern' };
+  const label = LABELS[data.category] ?? data.category;
+  await resend.emails.send({
+    from: 'We The People 39120 <noreply@wethepeople39120.com>',
+    to: data.to,
+    subject: `Official Response from ${data.aldermanName} — Report #${data.reportId}`,
+    html: `
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;background:#F7F9FC">
+      <div style="background:linear-gradient(135deg,#1A5EA8,#2D7A4F);padding:36px 24px 28px;text-align:center;border-radius:16px 16px 0 0">
+        <div style="text-align:center;margin-bottom:16px">
+          <span style="font-size:28px;font-weight:900;color:#ffffff;font-family:Georgia,serif">We The People</span><br/>
+          <span style="font-size:22px;font-weight:900;color:#ffffff;letter-spacing:4px;font-family:Georgia,serif">39120</span>
+        </div>
+        <h1 style="color:white;font-size:22px;font-weight:800;margin:0">Official Alderman Response</h1>
+        <p style="color:rgba(255,255,255,0.85);font-size:14px;margin-top:8px">Your report received an official response</p>
+      </div>
+      <div style="background:#ffffff;padding:32px 28px">
+        <p style="font-size:16px;color:#0F172A">Dear <strong>${data.citizenName}</strong>,</p>
+        <p style="font-size:15px;color:#475569;line-height:1.7"><strong>${data.aldermanName}</strong>, Alderman for <strong>Ward ${data.wardNumber}</strong>, has officially responded to your civic report.</p>
+        <div style="background:#E8F5EE;border:1px solid #2D7A4F;border-radius:14px;padding:20px 24px;margin:24px 0">
+          <div style="font-size:11px;font-weight:800;color:#2D7A4F;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Official Response from ${data.aldermanName}</div>
+          <p style="font-size:15px;color:#0F172A;line-height:1.75;font-style:italic;margin:0">"${data.aldermanResponse}"</p>
+          <div style="font-size:12px;color:#64748B;margin-top:12px">${data.aldermanName} · Ward ${data.wardNumber} Alderman · Natchez, MS</div>
+        </div>
+        <div style="background:#EBF2FB;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+          <div style="font-size:12px;color:#475569"><strong>Report:</strong> ${label} · #${data.reportId}</div>
+        </div>
+        <div style="text-align:center;margin:28px 0">
+          <a href="${data.reportUrl}" style="display:inline-block;background:#1A5EA8;color:white;font-weight:800;font-size:15px;padding:14px 32px;border-radius:12px;text-decoration:none">View Full Report</a>
+        </div>
+        <p style="font-size:13px;color:#94A3B8;text-align:center">We The People 39120 · Natchez, Mississippi · Built by KlickifyAgency.com</p>
+      </div>
+    </div>`
+  });
+}
