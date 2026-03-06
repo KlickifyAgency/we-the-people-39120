@@ -15,7 +15,7 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [stats, setStats] = useState({ reports: 0, metoos: 0, resolved: 0 });
+  const [stats, setStats] = useState({ reports: 0, metoos: 0, resolved: 0, points: 0, badges: [] as string[] });
   const [avatarUrl, setAvatarUrl] = useState<string|null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
@@ -62,7 +62,8 @@ export default function ProfilePage() {
   async function loadStats(uid: string) {
     const { count: reports } = await supabase.from('reports').select('*', { count: 'exact', head: true }).eq('user_id', uid);
     const { count: resolved } = await supabase.from('reports').select('*', { count: 'exact', head: true }).eq('user_id', uid).eq('status', 'resolved');
-    setStats({ reports: reports ?? 0, metoos: 0, resolved: resolved ?? 0 });
+    const { data: profile } = await supabase.from('profiles').select('points,badges').eq('id', uid).single();
+    setStats({ reports: reports ?? 0, metoos: 0, resolved: resolved ?? 0, points: profile?.points ?? 0, badges: profile?.badges ?? [] });
   }
 
   async function handleAuth() {
@@ -160,7 +161,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-3 gap-3 mb-8">
           {[
             { icon: MapPin, label: 'Reports', value: String(stats.reports) },
-            { icon: Star, label: 'Me Toos', value: String(stats.metoos) },
+            { icon: Star, label: 'Points', value: String(stats.points) },
             { icon: Shield, label: 'Resolved', value: String(stats.resolved) },
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="rounded-2xl p-4 text-center border" style={{background:'var(--color-surface2)',borderColor:'var(--color-border)'}}>
