@@ -126,7 +126,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 
   try {
     const result = await resend.emails.send({
-      from: 'We The People 39120 <onboarding@resend.dev>',
+      from: 'We The People 39120 <noreply@klickifyagency.com>',
       to: [data.aldermanEmail],
       cc: ['info@klickifyagency.com'],
       replyTo: 'support@klickifyagency.com',
