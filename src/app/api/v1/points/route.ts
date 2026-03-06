@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 const BADGES: Record<string,{icon:string,label:string}> = {
   first_report:{icon:'🏁',label:'First Report'},
   five_reports:{icon:'📋',label:'5 Reports'},
@@ -9,6 +8,7 @@ const BADGES: Record<string,{icon:string,label:string}> = {
   ward_champion:{icon:'🏆',label:'Ward Champion'},
 };
 export async function POST(req: NextRequest) {
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   const { user_id, action } = await req.json();
   if (!user_id || !action) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   const pointsMap: Record<string,number> = { report_submitted: 10, me_too: 2, report_resolved: 25 };
