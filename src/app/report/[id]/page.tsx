@@ -61,6 +61,7 @@ export default function ReportPage({ params }: { params: any }) {
     if (!reportId) return;
     supabase.from('reports').select('*, ward:wards(ward_number)').eq('id', reportId).single()
       .then(({ data }) => { setReport(data); setMetooCount(data?.me_too_count ?? 0); });
+    supabase.rpc('increment_view_count', { report_id: reportId }).catch(() => {});
   }, [reportId]);
 
   const handleMetoo = async () => {
