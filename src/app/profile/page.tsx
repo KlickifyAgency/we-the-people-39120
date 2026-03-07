@@ -9,6 +9,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<'login'|'signup'>('login');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -69,9 +70,15 @@ export default function ProfilePage() {
   async function handleAuth() {
     setError(''); setSuccess(''); setSubmitting(true);
     if (mode === 'signup') {
-      const { error: e } = await supabase.auth.signUp({ email, password });
+      if (!fullName.trim()) { setError('Please enter your full name.'); setSubmitting(false); return; }
+      const { data: signUpData, error: e } = await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
       if (e) setError(e.message);
-      else setSuccess('Account created! Check your email to confirm.');
+      else {
+        if (signUpData.user) {
+          await supabase.from('profiles').upsert({ id: signUpData.user.id, full_name: fullName, email });
+        }
+        setSuccess('Account created! Check your email to confirm.');
+      }
     } else {
       const { error: e } = await supabase.auth.signInWithPassword({ email, password });
       if (e) setError(e.message);
@@ -110,6 +117,11 @@ export default function ProfilePage() {
           ))}
         </div>
         <div className="flex flex-col gap-3">
+          {mode === 'signup' && (
+            <input type="text" placeholder="Full name" value={fullName} onChange={e => setFullName(e.target.value)}
+              className="w-full h-12 px-4 rounded-xl text-sm outline-none"
+              style={{background:'var(--color-surface2)',border:'1px solid var(--color-border)',color:'var(--color-text)'}} />
+          )}
           <input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)}
             className="w-full h-12 px-4 rounded-xl text-sm outline-none"
             style={{background:'var(--color-surface2)',border:'1px solid var(--color-border)',color:'var(--color-text)'}} />
@@ -123,7 +135,7 @@ export default function ProfilePage() {
           </div>
           {error && <p className="text-xs px-1" style={{color:'#f87171'}}>{error}</p>}
           {success && <p className="text-xs px-1" style={{color:'#34d399'}}>{success}</p>}
-          <button onClick={handleAuth} disabled={submitting || !email || !password}
+          <button onClick={handleAuth} disabled={submitting || !email || !password || (mode==='signup' && !fullName.trim())}
             className="w-full h-12 rounded-xl font-bold text-white text-sm mt-1"
             style={{background:'linear-gradient(135deg,#7c3aed,#a855f7,#06b6d4)',opacity:submitting?0.7:1}}>
             {submitting ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
