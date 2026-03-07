@@ -6,6 +6,15 @@ import { ThumbsUp, MapPin, CheckCircle2, Loader2 } from 'lucide-react';
 const C = { bg:'#F7F9FC',white:'#FFFFFF',border:'#DDE3EC',blue:'#1A5EA8',blueSoft:'#EBF2FB',green:'#2D7A4F',greenSoft:'#E8F5EE',amber:'#B45309',textMain:'#0F172A',textSub:'#475569',textMuted:'#94A3B8',danger:'#DC2626' };
 const LABELS: Record<string,string> = { graffiti:'Graffiti / Vandalism',dumping:'Illegal Dumping',abandoned_vehicle:'Abandoned Vehicle',property_neglect:'Property Neglect',noise:'Noise Complaint',street_issues:'Street / Pothole Issues',vegetation:'Overgrown Vegetation',animal:'Animal Issues',safety_hazard:'Safety Hazard',water_drainage:'Water / Drainage',public_safety:'Public Safety / Crime' };
 
+const ALDERMEN: Record<number, { name: string; initial: string; photo: string }> = {
+  1: { name: 'Valencia Hall', initial: 'VH', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1411' },
+  2: { name: 'Billie Joe Frazier', initial: 'BF', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1406' },
+  3: { name: 'Sarah Carter-Smith', initial: 'SC', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1410' },
+  4: { name: 'Felicia Bridgewater-Irving', initial: 'FB', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1408' },
+  5: { name: 'Benjamin Davis', initial: 'BD', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1405' },
+  6: { name: 'Curtis Moroney', initial: 'CM', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1407' },
+};
+
 function DaysCounter({ createdAt }: { createdAt: string }) {
   const days = Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000);
   const remaining = 30 - days;
@@ -82,6 +91,30 @@ export default function ReportPage({ params }: { params: any }) {
 
       <div style={{maxWidth:560,margin:'0 auto',padding:'20px 16px'}}>
 
+        {/* Alderman Card */}
+        {(() => {
+          const wardNum = report.ward_number ?? report.ward?.ward_number;
+          const alderman = wardNum ? ALDERMEN[Number(wardNum)] : null;
+          if (!alderman) return null;
+          return (
+            <div style={{background:'#fff',border:'1px solid #e5e7eb',borderRadius:16,padding:'14px 16px',marginBottom:16,display:'flex',alignItems:'center',gap:14,boxShadow:'0 2px 8px rgba(26,94,168,0.08)'}}>
+              <div style={{width:56,height:56,borderRadius:'50%',overflow:'hidden',flexShrink:0,background:'linear-gradient(135deg,#1A5EA8,#2D7A4F)',border:'2px solid #e5e7eb',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <img src={alderman.photo} alt={alderman.name} style={{width:'100%',height:'100%',objectFit:'cover'}} onError={(e)=>{(e.target as HTMLImageElement).style.display='none';}} />
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:10,fontWeight:700,color:'#1A5EA8',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:2}}>Ward {wardNum} Alderman</div>
+                <div style={{fontSize:15,fontWeight:800,color:'#0F172A',marginBottom:2}}>{alderman.name}</div>
+                <div style={{fontSize:12,color:'#6b7280'}}>Responsible for responding within 30 days</div>
+              </div>
+              <div style={{flexShrink:0,background:'#EBF2FB',borderRadius:10,padding:'6px 10px',textAlign:'center'}}>
+                <div style={{fontSize:18,fontWeight:900,color:'#1A5EA8'}}>{Math.floor((Date.now() - new Date(report.created_at).getTime()) / 86400000)}</div>
+                <div style={{fontSize:9,fontWeight:700,color:'#1A5EA8',textTransform:'uppercase'}}>days</div>
+              </div>
+            </div>
+          );
+        })()}
+
+
         {report.photo_url && (
           <div style={{borderRadius:16,overflow:'hidden',marginBottom:16,border:`1px solid ${C.border}`}}>
             <img src={report.photo_url} alt="Report photo" style={{width:'100%',maxHeight:280,objectFit:'cover',display:'block'}} />
@@ -107,7 +140,7 @@ export default function ReportPage({ params }: { params: any }) {
         <div style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:16,overflow:'hidden',marginBottom:16}}>
           {[
             ['Issue', LABELS[report.category] ?? report.category],
-            ['Ward', `Ward ${report.ward?.ward_number ?? 'Unknown'} — Natchez, MS`],
+            ['Ward', `Ward ${report.ward_number ?? report.ward?.ward_number ?? 'Unknown'} — Natchez, MS`],
             ['Filed', new Date(report.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})],
             ['Support', `${metooCount} neighbor${metooCount !== 1 ? 's' : ''} supporting`],
             ['Status', report.alderman_response ? '✅ Alderman Responded' : days >= 30 ? '🔴 Pending Resolution' : '⏳ Awaiting Response'],
