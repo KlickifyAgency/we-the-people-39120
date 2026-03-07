@@ -51,6 +51,12 @@ export default function ReportPage({ params }: { params: any }) {
 
   useEffect(() => {
     if (!reportId) return;
+    const key = `metoo_${reportId}`;
+    if (localStorage.getItem(key) === '1') setMetooPressed(true);
+  }, [reportId]);
+
+  useEffect(() => {
+    if (!reportId) return;
     supabase.from('reports').select('*, ward:wards(ward_number)').eq('id', reportId).single()
       .then(({ data }) => { setReport(data); setMetooCount(data?.me_too_count ?? 0); });
   }, [reportId]);
@@ -60,6 +66,7 @@ export default function ReportPage({ params }: { params: any }) {
     setMetooLoading(true);
     setMetooCount(c => c + 1);
     setMetooPressed(true);
+    localStorage.setItem(`metoo_${reportId}`, '1');
     await fetch(`/api/v1/reports/${reportId}/metoo`, { method: 'POST' });
     setMetooLoading(false);
   };
