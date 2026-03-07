@@ -263,7 +263,7 @@ export function ReportForm() {
               </button>
             </div>
           )}
-          <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={onFile} />
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
         </>}
 
         {/* STEP: LOCATION */}
