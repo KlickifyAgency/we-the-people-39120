@@ -47,13 +47,15 @@ export default function ReportPage({ params }: { params: any }) {
 
   const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
-  useEffect(() => { Promise.resolve(params).then(p => setReportId(p.id)); }, []);
-
   useEffect(() => {
-    if (!reportId) return;
-    const key = `metoo_${reportId}`;
-    if (localStorage.getItem(key) === '1') setMetooPressed(true);
-  }, [reportId]);
+    Promise.resolve(params).then(p => {
+      setReportId(p.id);
+      const key = `metoo_${p.id}`;
+      if (typeof window !== 'undefined' && localStorage.getItem(key) === '1') {
+        setMetooPressed(true);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (!reportId) return;
