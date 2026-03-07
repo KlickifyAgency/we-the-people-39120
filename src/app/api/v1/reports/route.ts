@@ -66,9 +66,11 @@ export async function POST(req: NextRequest) {
   }
 
   const respondToken = crypto.randomUUID();
+  const wardInfo = detectWardServer(lat, lng);
+  const wardNumber = wardInfo?.ward ?? null;
   const { data: report, error } = await supabase
     .from('reports')
-    .insert({ category, lat, lng, description, anonymous, photo_url, status: 'pending', respond_token: respondToken })
+    .insert({ category, lat, lng, description, anonymous, photo_url, status: 'pending', respond_token: respondToken, ward_number: wardNumber, user_id: userId ?? null })
     .select('*, ward:wards(ward_number)')
     .single();
 
@@ -82,7 +84,6 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const wardInfo = detectWardServer(lat, lng);
     if (wardInfo) {
       await sendAldermanNotification({
         aldermanName:  wardInfo.alderman,
