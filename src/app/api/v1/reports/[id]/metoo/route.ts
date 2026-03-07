@@ -34,6 +34,9 @@ export async function POST(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+  // Increment me_too_count
+  await supabase.rpc('increment_me_too', { report_id: id });
+
   // Get updated count
   const { data: report } = await supabase
     .from('reports')
