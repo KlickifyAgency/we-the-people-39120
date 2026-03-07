@@ -133,7 +133,18 @@ export async function POST(req: NextRequest) {
       await fetch(makeUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, photo_url: photo_url ?? null, image_url: photo_url ?? null, report_url: reportUrl, category: label, ward: `Ward ${wardNum}`, has_photo: !!photo_url }),
+        body: JSON.stringify({
+          message,
+          photo_url: photo_url ?? null,
+          image_url: photo_url ?? null,
+          report_url: reportUrl,
+          category: label,
+          ward: `Ward ${wardNum}`,
+          has_photo: !!photo_url,
+          alderman_name: aldermanName,
+          alderman_photo: wardNum && wardNum !== '?' ? `https://natchez.ms.us/ImageRepository/Document?documentId=${[0,1411,1406,1410,1408,1405,1407][Number(wardNum)]}` : null,
+          ward_number: wardNum,
+        }),
       }).catch(e => console.error('Make webhook failed:', e));
     }
   } catch (fbErr) {
