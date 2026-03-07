@@ -22,13 +22,13 @@ const DEFAULT_FILTERS: FeedFilters = {
 };
 
 
-const ALDERMEN: Record<number, { name: string; initial: string }> = {
-  1: { name: 'Valencia Hall', initial: 'VH' },
-  2: { name: 'Billie Joe Frazier', initial: 'BF' },
-  3: { name: 'Sarah Carter-Smith', initial: 'SC' },
-  4: { name: 'Felicia Bridgewater-Irving', initial: 'FB' },
-  5: { name: 'Benjamin Davis', initial: 'BD' },
-  6: { name: 'Curtis Moroney', initial: 'CM' },
+const ALDERMEN: Record<number, { name: string; initial: string; photo: string }> = {
+  1: { name: 'Valencia Hall', initial: 'VH', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1411' },
+  2: { name: 'Billie Joe Frazier', initial: 'BF', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1406' },
+  3: { name: 'Sarah Carter-Smith', initial: 'SC', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1410' },
+  4: { name: 'Felicia Bridgewater-Irving', initial: 'FB', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1408' },
+  5: { name: 'Benjamin Davis', initial: 'BD', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1405' },
+  6: { name: 'Curtis Moroney', initial: 'CM', photo: 'https://natchez.ms.us/ImageRepository/Document?documentId=1407' },
 };
 
 function WardGroupedList({ reports }: { reports: any[] }) {
@@ -65,8 +65,8 @@ function WardGroupedList({ reports }: { reports: any[] }) {
               style={{width:'100%',display:'flex',alignItems:'center',gap:12,padding:'12px 16px',background:'var(--color-surface)',border:'none',borderBottom:'1px solid var(--color-border)',cursor:'pointer',textAlign:'left'}}
             >
               {/* Alderman avatar */}
-              <div style={{width:42,height:42,borderRadius:'50%',background:'linear-gradient(135deg,#1A5EA8,#2D7A4F)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:'#fff',fontWeight:700,fontSize:13}}>
-                {alderman.initial}
+              <div style={{width:42,height:42,borderRadius:'50%',overflow:'hidden',flexShrink:0,background:'linear-gradient(135deg,#1A5EA8,#2D7A4F)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <img src={alderman.photo} alt={alderman.name} style={{width:'100%',height:'100%',objectFit:'cover'}} onError={(e)=>{(e.target as HTMLImageElement).style.display='none';}} />
               </div>
               {/* Info */}
               <div style={{flex:1,minWidth:0}}>
