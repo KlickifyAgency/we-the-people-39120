@@ -49,5 +49,44 @@ export async function POST(req: NextRequest) {
     } catch(e) { console.error('Failed to send citizen notification:', e); }
   }
 
+  // Post alderman response to Facebook via Make webhook
+  try {
+    const makeUrl = process.env.MAKE_WEBHOOK_URL;
+    if (makeUrl) {
+      const wardNum = report.ward_number ?? '?';
+      const aldermanName = ALDERMEN[Number(wardNum)] ?? 'Your Alderman';
+      const aldermanPhoto = wardNum && wardNum !== '?' ? `https://natchez.ms.us/ImageRepository/Document?documentId=${[0,1411,1406,1410,1408,1405,1407][Number(wardNum)]}` : null;
+      const reportUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://we-the-people-39120.vercel.app'}/report/${report.id}`;
+      const LABELS: Record<string,string> = { graffiti:'Graffiti / Vandalism',dumping:'Illegal Dumping',abandoned_vehicle:'Abandoned Vehicle',property_neglect:'Property Neglect',noise:'Noise Complaint',street_issues:'Street / Pothole Issues',vegetation:'Overgrown Vegetation',animal:'Animal Issues',safety_hazard:'Safety Hazard',water_drainage:'Water / Drainage',public_safety:'Public Safety' };
+      const label = LABELS[report.category] ?? report.category;
+      const message = `✅ OFFICIAL RESPONSE — ${label.toUpperCase()}
+
+🏛️ Ward ${wardNum} Alderman ${aldermanName} has officially responded:
+
+"${response.slice(0, 300)}${response.length > 300 ? '...' : ''}"
+
+👉 View the full report & response: ${reportUrl}
+
+#WeThePeople39120 #Natchez #NatchezMS #Ward${wardNum} #Mississippi #CivicEngagement`;
+      await fetch(makeUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          photo_url: aldermanPhoto,
+          image_url: aldermanPhoto,
+          report_url: reportUrl,
+          category: label,
+          ward: `Ward ${wardNum}`,
+          has_photo: !!aldermanPhoto,
+          alderman_name: aldermanName,
+          alderman_photo: aldermanPhoto,
+          ward_number: wardNum,
+          type: 'alderman_response',
+        }),
+      }).catch(e => console.error('Make webhook failed:', e));
+    }
+  } catch(e) { console.error('Facebook post failed:', e); }
+
   return NextResponse.json({ success: true });
 }
