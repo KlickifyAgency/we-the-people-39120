@@ -31,21 +31,7 @@ export function detectWardServer(lat: number, lng: number): WardInfo | null {
         }
       }
     }
-    // Fallback: find nearest ward centroid
-    let nearest: WardInfo | null = null;
-    let minDist = Infinity;
-    for (const feature of wards.features) {
-      if (feature.geometry.type === 'Polygon') {
-        const poly = turf.polygon(feature.geometry.coordinates);
-        const centroid = turf.centroid(poly);
-        const dist = turf.distance(point, centroid);
-        if (dist < minDist) {
-          minDist = dist;
-          nearest = feature.properties as WardInfo;
-        }
-      }
-    }
-    return minDist < 10 ? nearest : null;
+    return null;
   } catch {
     return null;
   }

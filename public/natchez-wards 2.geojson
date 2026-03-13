@@ -1,0 +1,35 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "ward": 1, "alderman": "Valencia Hall", "email": "vhall@natchez.ms.us", "phone": "(601) 445-7555" },
+      "geometry": { "type": "Polygon", "coordinates": [[[-91.430,31.600],[-91.392,31.600],[-91.392,31.548],[-91.418,31.548],[-91.430,31.548],[-91.430,31.600]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "ward": 2, "alderman": "Billie Joe Frazier", "email": "bfrazier@natchez.ms.us", "phone": "(601) 445-7555" },
+      "geometry": { "type": "Polygon", "coordinates": [[[-91.392,31.600],[-91.350,31.600],[-91.350,31.548],[-91.392,31.548],[-91.392,31.600]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "ward": 3, "alderman": "Sarah Carter-Smith", "email": "scsmith@natchez.ms.us", "phone": "(601) 445-7555" },
+      "geometry": { "type": "Polygon", "coordinates": [[[-91.392,31.548],[-91.350,31.548],[-91.350,31.520],[-91.392,31.520],[-91.392,31.548]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "ward": 4, "alderman": "Felicia Bridgewater-Irving", "email": "firving@natchez.ms.us", "phone": "(601) 445-7555" },
+      "geometry": { "type": "Polygon", "coordinates": [[[-91.430,31.548],[-91.392,31.548],[-91.392,31.520],[-91.430,31.520],[-91.430,31.548]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "ward": 5, "alderman": "Benjamin Davis", "email": "bdavis@natchez.ms.us", "phone": "(601) 445-7555" },
+      "geometry": { "type": "Polygon", "coordinates": [[[-91.430,31.520],[-91.350,31.520],[-91.350,31.500],[-91.430,31.500],[-91.430,31.520]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "ward": 6, "alderman": "Curtis Moroney", "email": "cmoroney@natchez.ms.us", "phone": "(601) 445-7555" },
+      "geometry": { "type": "Polygon", "coordinates": [[[-91.480,31.600],[-91.430,31.600],[-91.430,31.500],[-91.480,31.500],[-91.480,31.600]]] }
+    }
+  ]
+}
