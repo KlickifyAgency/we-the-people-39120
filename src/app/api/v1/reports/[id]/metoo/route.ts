@@ -41,7 +41,7 @@ export async function POST(
   // Get updated count
   const { data: report } = await supabase
     .from('reports')
-    .select('me_too_count, status')
+    .select('me_too_count, status, category, ward_number, description')
     .eq('id', id)
     .single();
 
