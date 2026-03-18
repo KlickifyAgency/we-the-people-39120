@@ -4,6 +4,7 @@ import { ReportCategory } from '@/lib/types';
 import { sendAldermanNotification } from '@/lib/email';
 import { detectWardServer } from '@/lib/ward-detection-server';
 import { MAYOR } from '@/lib/constants';
+import { notifyAllCitizens } from '@/lib/notify-citizens';
 
 export async function GET(req: NextRequest) {
   const supabase = createClient();
@@ -75,6 +76,17 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  // Notify all citizens about new report
+  notifyAllCitizens({
+    eventType: 'new_report',
+    category,
+    wardNumber: wardNumber ?? '?',
+    reportId: report.id,
+    description: description ?? undefined,
+    photoUrl: photo_url ?? undefined,
+    excludeUserId: userId ?? undefined,
+  }).catch(() => {});
+
   // Award points to user if not anonymous
   if (userId) {
     fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'https://we-the-people-39120.vercel.app'}/api/v1/points`, {

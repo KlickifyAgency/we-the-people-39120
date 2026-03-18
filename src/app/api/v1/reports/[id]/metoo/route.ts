@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase';
 import { ESCALATION_THRESHOLDS } from '@/lib/constants';
 import { isEnabled } from '@/lib/features';
+import { notifyReportOwner } from '@/lib/notify-citizens';
 
 // POST /api/v1/reports/[id]/metoo — anonymous Me Too confirmation
 export async function POST(
@@ -52,6 +53,17 @@ export async function POST(
   ) {
     // TODO Phase 2: Send notification to ward alderman
     // await notifyAlderman(id);
+  }
+
+  // Notify report owner
+  if (report) {
+    notifyReportOwner({
+      reportId: id,
+      eventType: 'me_too',
+      category: report.category,
+      wardNumber: report.ward_number ?? '?',
+      description: report.description ?? undefined,
+    }).catch(() => {});
   }
 
   return NextResponse.json({ me_too_count: report?.me_too_count ?? 0 });

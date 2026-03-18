@@ -189,3 +189,89 @@ export async function sendAldermanResponseEmail(data: AldermanResponseEmailData)
     </div>`
   });
 }
+
+export async function sendCitizenActivityEmail({
+  to,
+  subject,
+  citizenName,
+  eventType,
+  category,
+  wardNumber,
+  aldermanName,
+  description,
+  reportUrl,
+  photoUrl,
+}: {
+  to: string;
+  subject: string;
+  citizenName: string;
+  eventType: 'new_report' | 'alderman_response' | 'me_too' | 'status_change';
+  category: string;
+  wardNumber: number | string;
+  aldermanName: string;
+  description?: string;
+  reportUrl: string;
+  photoUrl?: string;
+}) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://we-the-people-39120.vercel.app';
+  const CATEGORY_LABELS2: Record<string,string> = {
+    graffiti:'Graffiti / Vandalism', dumping:'Illegal Dumping', abandoned_vehicle:'Abandoned Vehicle',
+    property_neglect:'Property Neglect', noise:'Noise Complaint', street_issues:'Street / Pothole Issues',
+    vegetation:'Overgrown Vegetation', animal:'Animal Issues', safety_hazard:'Safety Hazard',
+    water_drainage:'Water / Drainage Problem', public_safety:'Public Safety Concern',
+  };
+  const label = CATEGORY_LABELS2[category] ?? category;
+
+  const eventMessages: Record<string, { icon: string; headline: string; body: string }> = {
+    new_report: {
+      icon: '🚨',
+      headline: `New Report in Ward ${wardNumber}`,
+      body: `A new civic issue has been reported in your community: <strong>${label}</strong>. ${aldermanName} has 30 days to respond publicly.`,
+    },
+    alderman_response: {
+      icon: '✅',
+      headline: `${aldermanName} Has Responded!`,
+      body: `Ward ${wardNumber} Alderman <strong>${aldermanName}</strong> has officially responded to a community report. See their response and support your neighbors.`,
+    },
+    me_too: {
+      icon: '👍',
+      headline: `A Neighbor Supports Your Report`,
+      body: `Someone in your community clicked "Me Too" on your report. More support means more pressure on elected officials to act.`,
+    },
+    status_change: {
+      icon: '📋',
+      headline: `Your Report Status Has Changed`,
+      body: `Your civic report (<strong>${label}</strong>) has been updated. Check the latest status on the platform.`,
+    },
+  };
+
+  const ev = eventMessages[eventType];
+
+  const html = `<!DOCTYPE html>
+<html><body style="margin:0;padding:0;background:#F0F4FA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+<div style="max-width:600px;margin:0 auto;padding:24px 16px">
+  <div style="background:linear-gradient(135deg,#1A5EA8,#2D7A4F);border-radius:16px 16px 0 0;padding:28px 32px;text-align:center">
+    <img src="${appUrl}/icons/icon-192.png" width="56" height="56" style="border-radius:12px;margin-bottom:12px" />
+    <h1 style="color:#fff;font-size:20px;font-weight:900;margin:0">We The People 39120</h1>
+    <p style="color:rgba(255,255,255,0.8);font-size:13px;margin:4px 0 0">Natchez, MS — Civic Engagement Platform</p>
+  </div>
+  <div style="background:#fff;padding:32px;border-radius:0 0 16px 16px;box-shadow:0 4px 24px rgba(0,0,0,0.08)">
+    <div style="font-size:36px;text-align:center;margin-bottom:16px">${ev.icon}</div>
+    <h2 style="font-size:20px;font-weight:900;color:#0F172A;text-align:center;margin:0 0 12px">${ev.headline}</h2>
+    <p style="font-size:14px;color:#475569;line-height:1.7;text-align:center;margin:0 0 24px">${ev.body}</p>
+    ${photoUrl ? `<div style="border-radius:12px;overflow:hidden;margin-bottom:20px"><img src="${photoUrl}" style="width:100%;max-height:240px;object-fit:cover;display:block" /></div>` : ''}
+    ${description ? `<div style="background:#F8FAFC;border-left:3px solid #1A5EA8;padding:14px 16px;border-radius:8px;margin-bottom:20px"><p style="font-size:13px;color:#475569;font-style:italic;margin:0">"${description.slice(0,200)}${description.length>200?'...':''}"</p></div>` : ''}
+    <a href="${reportUrl}" style="display:block;background:linear-gradient(135deg,#1A5EA8,#2D7A4F);color:#fff;text-decoration:none;text-align:center;padding:16px;border-radius:12px;font-weight:700;font-size:15px;margin-bottom:16px">View Report & Take Action →</a>
+    <p style="font-size:11px;color:#94A3B8;text-align:center;margin:0">You're receiving this because you have an account on We The People 39120.<br>Built by <a href="https://klickifyagency.com" style="color:#1A5EA8">KlickifyAgency.com</a></p>
+  </div>
+</div>
+</body></html>`;
+
+  await resend.emails.send({
+    from: 'We The People 39120 <noreply@klickifyagency.com>',
+    to,
+    subject,
+    html,
+  });
+}

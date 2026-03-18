@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendAldermanResponseEmail } from '@/lib/email';
+import { notifyAllCitizens } from '@/lib/notify-citizens';
 
 const ALDERMEN: Record<number,string> = {1:'Valencia Hall',2:'Billie Joe Frazier',3:'Sarah Carter-Smith',4:'Felicia Bridgewater-Irving',5:'Benjamin Davis',6:'Curtis Moroney'};
 
@@ -48,6 +49,15 @@ export async function POST(req: NextRequest) {
       }
     } catch(e) { console.error('Failed to send citizen notification:', e); }
   }
+
+  // Notify all citizens about alderman response
+  notifyAllCitizens({
+    eventType: 'alderman_response',
+    category: report.category,
+    wardNumber: report.ward_number ?? '?',
+    reportId: report.id,
+    description: response,
+  }).catch(() => {});
 
   // Post alderman response to Facebook via Make webhook
   try {
