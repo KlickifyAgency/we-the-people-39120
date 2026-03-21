@@ -65,10 +65,15 @@ export async function notifyAllCitizens({
       }).catch(e => console.error(`Failed to notify ${u.email}:`, e))
     );
 
-  const results = await Promise.allSettled(promises);
-  const failed = results.filter(r => r.status === 'rejected').length;
-  const succeeded = results.filter(r => r.status === 'fulfilled').length;
-  console.log(`[notify-citizens] Sent: ${succeeded}, Failed: ${failed}, Total: ${results.length}`);
+  // Send in batches of 3 to avoid timeout
+  let succeeded = 0, failed = 0;
+  for (let i = 0; i < promises.length; i += 3) {
+    const batch = promises.slice(i, i + 3);
+    const results = await Promise.allSettled(batch);
+    succeeded += results.filter(r => r.status === 'fulfilled').length;
+    failed += results.filter(r => r.status === 'rejected').length;
+  }
+  console.log(`[notify-citizens] Sent: ${succeeded}, Failed: ${failed}, Total: ${filteredUsers.length}`);
 }
 
 export async function notifyReportOwner({
