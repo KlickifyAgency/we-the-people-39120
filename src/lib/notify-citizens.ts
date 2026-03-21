@@ -15,6 +15,7 @@ async function getAllUsers(): Promise<{ id: string; email: string; full_name: st
   const { data: { users } } = await supabase.auth.admin.listUsers();
   const { data: profiles } = await supabase.from('profiles').select('id, full_name, ward_number, email');
   const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+  console.log(`[notify-citizens] getAllUsers: ${(users ?? []).length} auth users found`);
   return (users ?? [])
     .filter(u => u.email)
     .map(u => ({
@@ -63,7 +64,10 @@ export async function notifyAllCitizens({
       }).catch(e => console.error(`Failed to notify ${u.email}:`, e))
     );
 
-  await Promise.allSettled(promises);
+  const results = await Promise.allSettled(promises);
+  const failed = results.filter(r => r.status === 'rejected').length;
+  const succeeded = results.filter(r => r.status === 'fulfilled').length;
+  console.log(`[notify-citizens] Sent: ${succeeded}, Failed: ${failed}, Total: ${results.length}`);
 }
 
 export async function notifyReportOwner({
