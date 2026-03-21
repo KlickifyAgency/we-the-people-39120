@@ -83,7 +83,6 @@ export default function ReportPage({ params }: { params: any }) {
     const { data: newComment, error: commentError } = await supabase.from('comments').insert({
       report_id: reportId,
       content: comment,
-      anonymous: true,
     }).select().single();
     if (commentError) { console.error('Comment error:', commentError); setError('Failed to submit. Please try again.'); setSubmitting(false); return; }
     setComments(c => [...c, newComment]);
