@@ -16,7 +16,7 @@ async function getAllUsers(): Promise<{ id: string; email: string; full_name: st
   const { data: profiles } = await supabase.from('profiles').select('id, full_name, ward_number, email');
   const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
   return (users ?? [])
-    .filter(u => u.email && u.confirmed_at)
+    .filter(u => u.email)
     .map(u => ({
       id: u.id,
       email: u.email!,
