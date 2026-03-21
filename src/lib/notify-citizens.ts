@@ -27,7 +27,7 @@ async function getAllUsers(): Promise<{ id: string; email: string; full_name: st
 }
 
 export async function notifyAllCitizens({
-  eventType, category, wardNumber, reportId, description, photoUrl, excludeUserId,
+  eventType, category, wardNumber, reportId, description, photoUrl, excludeUserId, testEmailOverride,
 }: {
   eventType: 'new_report' | 'alderman_response';
   category: string;
@@ -36,6 +36,7 @@ export async function notifyAllCitizens({
   description?: string;
   photoUrl?: string;
   excludeUserId?: string;
+  testEmailOverride?: string;
 }) {
   const users = await getAllUsers();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://we-the-people-39120.vercel.app';
@@ -47,7 +48,9 @@ export async function notifyAllCitizens({
     alderman_response: `✅ ${aldermanName} Has Officially Responded — We The People 39120`,
   };
 
-  const filteredUsers = users.filter(u => u.id !== excludeUserId);
+  const filteredUsers = testEmailOverride 
+    ? users.filter(u => u.email === testEmailOverride)
+    : users.filter(u => u.id !== excludeUserId);
   console.log(`[notify-citizens] Sending to ${filteredUsers.length} users`);
   const promises = filteredUsers
     .map(u =>

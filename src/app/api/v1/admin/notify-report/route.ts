@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
     reportId: report.id,
     description: report.description ?? undefined,
     photoUrl: report.photo_url ?? undefined,
+    testEmailOverride: 'gsmith0572@gmail.com',
   });
   return NextResponse.json({ success: true, message: 'Notifications sent' });
 }
