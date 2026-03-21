@@ -85,7 +85,7 @@ export default function ReportPage({ params }: { params: any }) {
       content: comment,
       anonymous: true,
     }).select().single();
-    if (commentError) { setError('Failed to submit. Please try again.'); setSubmitting(false); return; }
+    if (commentError) { console.error('Comment error:', commentError); setError('Failed to submit. Please try again.'); setSubmitting(false); return; }
     setComments(c => [...c, newComment]);
     setSubmitted(true); setSubmitting(false);
   };
