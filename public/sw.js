@@ -1,4 +1,4 @@
-const CACHE = 'wtp39120-v1';
+const CACHE = 'wtp39120-v8';
 const PRECACHE = ['/', '/report', '/feed', '/map', '/profile'];
 
 self.addEventListener('install', e => {
