@@ -47,8 +47,9 @@ export async function notifyAllCitizens({
     alderman_response: `✅ ${aldermanName} Has Officially Responded — We The People 39120`,
   };
 
-  const promises = users
-    .filter(u => u.id !== excludeUserId)
+  const filteredUsers = users.filter(u => u.id !== excludeUserId);
+  console.log(`[notify-citizens] Sending to ${filteredUsers.length} users`);
+  const promises = filteredUsers
     .map(u =>
       sendCitizenActivityEmail({
         to: u.email,

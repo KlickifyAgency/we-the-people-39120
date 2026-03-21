@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { notifyAllCitizens } from '@/lib/notify-citizens';
 import { createClient } from '@supabase/supabase-js';
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   const { reportId } = await req.json();
   if (!reportId) return NextResponse.json({ error: 'Missing reportId' }, { status: 400 });
