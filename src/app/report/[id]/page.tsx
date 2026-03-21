@@ -42,6 +42,7 @@ export default function ReportPage({ params }: { params: any }) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [metooCount, setMetooCount] = useState(0);
+  const [comments, setComments] = useState<any[]>([]);
   const [metooLoading, setMetooLoading] = useState(false);
   const [metooPressed, setMetooPressed] = useState(false);
 
@@ -61,6 +62,8 @@ export default function ReportPage({ params }: { params: any }) {
     if (!reportId) return;
     supabase.from('reports').select('*, ward:wards(ward_number)').eq('id', reportId).single()
       .then(({ data }) => { setReport(data); setMetooCount(data?.me_too_count ?? 0); });
+    supabase.from('comments').select('*').eq('report_id', reportId).order('created_at', { ascending: true })
+      .then(({ data }) => setComments(data ?? []));
     void supabase.rpc('increment_view_count', { report_id: reportId });
   }, [reportId]);
 
@@ -77,7 +80,13 @@ export default function ReportPage({ params }: { params: any }) {
   const handleComment = async () => {
     if (comment.trim().length < 5) { setError('Please write at least 5 characters.'); return; }
     setSubmitting(true);
-    await supabase.from('reports').update({ community_comment: comment }).eq('id', reportId);
+    const { data: newComment, error: commentError } = await supabase.from('comments').insert({
+      report_id: reportId,
+      content: comment,
+      anonymous: true,
+    }).select().single();
+    if (commentError) { setError('Failed to submit. Please try again.'); setSubmitting(false); return; }
+    setComments(c => [...c, newComment]);
     setSubmitted(true); setSubmitting(false);
   };
 
@@ -172,6 +181,22 @@ export default function ReportPage({ params }: { params: any }) {
           style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,background:C.blue,color:'white',textDecoration:'none',height:52,borderRadius:14,fontWeight:700,fontSize:15,marginBottom:16,boxShadow:'0 4px 16px rgba(26,94,168,0.3)'}}>
           <MapPin size={18} /> View Location on Google Maps
         </a>
+
+        {/* Community Comments */}
+        {comments.length > 0 && (
+          <div style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:16,overflow:'hidden',marginBottom:16}}>
+            <div style={{padding:'14px 16px',borderBottom:`1px solid ${C.border}`,display:'flex',alignItems:'center',gap:8}}>
+              <span style={{fontSize:13,fontWeight:800,color:C.textMain}}>💬 Community Updates</span>
+              <span style={{fontSize:11,color:C.textMuted,background:C.blueSoft,padding:'2px 8px',borderRadius:99,fontWeight:700}}>{comments.length}</span>
+            </div>
+            {comments.map((c, i) => (
+              <div key={c.id} style={{padding:'12px 16px',borderBottom:i<comments.length-1?`1px solid ${C.border}`:'none'}}>
+                <p style={{fontSize:13,color:C.textSub,margin:'0 0 4px',lineHeight:1.6}}>"{c.content}"</p>
+                <p style={{fontSize:11,color:C.textMuted,margin:0}}>{new Date(c.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {report.alderman_response ? (
           <div style={{background:C.greenSoft,border:`1px solid ${C.green}`,borderRadius:16,padding:20,marginBottom:16}}>
