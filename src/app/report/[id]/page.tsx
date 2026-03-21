@@ -62,8 +62,7 @@ export default function ReportPage({ params }: { params: any }) {
     if (!reportId) return;
     supabase.from('reports').select('*, ward:wards(ward_number)').eq('id', reportId).single()
       .then(({ data }) => { setReport(data); setMetooCount(data?.me_too_count ?? 0); });
-    supabase.from('comments').select('*').eq('report_id', reportId).order('created_at', { ascending: true })
-      .then(({ data }) => setComments(data ?? []));
+    fetch(`/api/v1/comments?report_id=${reportId}`).then(r=>r.json()).then(data=>setComments(Array.isArray(data)?data:[]));
     void supabase.rpc('increment_view_count', { report_id: reportId });
   }, [reportId]);
 
@@ -80,11 +79,13 @@ export default function ReportPage({ params }: { params: any }) {
   const handleComment = async () => {
     if (comment.trim().length < 5) { setError('Please write at least 5 characters.'); return; }
     setSubmitting(true);
-    const { data: newComment, error: commentError } = await supabase.from('comments').insert({
-      report_id: reportId,
-      content: comment,
-    }).select().single();
-    if (commentError) { console.error('Comment error:', commentError); setError('Failed to submit. Please try again.'); setSubmitting(false); return; }
+    const res = await fetch('/api/v1/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_id: reportId, content: comment }),
+    });
+    const newComment = await res.json();
+    if (!res.ok) { console.error('Comment error:', newComment); setError('Failed to submit. Please try again.'); setSubmitting(false); return; }
     setComments(c => [...c, newComment]);
     setSubmitted(true); setSubmitting(false);
   };
