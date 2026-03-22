@@ -38,6 +38,8 @@ export default function ReportPage({ params }: { params: any }) {
   const [report, setReport] = useState<any>(null);
   const [reportId, setReportId] = useState('');
   const [comment, setComment] = useState('');
+  const [commentPhoto, setCommentPhoto] = useState<File | null>(null);
+  const [commentPhotoPreview, setCommentPhotoPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
@@ -79,10 +81,13 @@ export default function ReportPage({ params }: { params: any }) {
   const handleComment = async () => {
     if (comment.trim().length < 5) { setError('Please write at least 5 characters.'); return; }
     setSubmitting(true);
+    const fd = new FormData();
+    fd.append('report_id', reportId);
+    fd.append('content', comment);
+    if (commentPhoto) fd.append('photo', commentPhoto);
     const res = await fetch('/api/v1/comments', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ report_id: reportId, content: comment }),
+      body: fd,
     });
     const newComment = await res.json();
     if (!res.ok) { console.error('Comment error:', newComment); setError('Failed to submit. Please try again.'); setSubmitting(false); return; }
@@ -191,7 +196,7 @@ export default function ReportPage({ params }: { params: any }) {
             </div>
             {comments.map((c, i) => (
               <div key={c.id} style={{padding:'12px 16px',borderBottom:i<comments.length-1?`1px solid ${C.border}`:'none'}}>
-                <p style={{fontSize:13,color:C.textSub,margin:'0 0 4px',lineHeight:1.6}}>"{c.content}"</p>
+                {c.photo_url && <img src={c.photo_url} style={{width:'100%',maxHeight:180,objectFit:'cover',borderRadius:8,marginBottom:8,display:'block'}} />}<p style={{fontSize:13,color:C.textSub,margin:'0 0 4px',lineHeight:1.6}}>"{c.content}"</p>
                 <p style={{fontSize:11,color:C.textMuted,margin:0}}>{new Date(c.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</p>
               </div>
             ))}
@@ -217,15 +222,27 @@ export default function ReportPage({ params }: { params: any }) {
               </div>
             ) : (
               <>
+                {commentPhotoPreview && (
+                  <div style={{borderRadius:10,overflow:'hidden',marginBottom:10,position:'relative'}}>
+                    <img src={commentPhotoPreview} style={{width:'100%',maxHeight:160,objectFit:'cover',display:'block'}} />
+                    <button onClick={()=>{setCommentPhoto(null);setCommentPhotoPreview(null);}} style={{position:'absolute',top:6,right:6,background:'rgba(0,0,0,0.5)',color:'#fff',border:'none',borderRadius:'50%',width:24,height:24,cursor:'pointer',fontSize:14}}>×</button>
+                  </div>
+                )}
                 <textarea value={comment} onChange={e => { setComment(e.target.value); setError(''); }}
                   placeholder="How long has this been here? Is it getting worse? Any other context..."
                   rows={4}
                   style={{width:'100%',padding:'14px 16px',borderRadius:12,border:`1.5px solid ${error ? C.danger : C.border}`,fontSize:14,lineHeight:1.65,resize:'none',outline:'none',color:C.textMain,fontFamily:'inherit',boxSizing:'border-box',background:C.bg}} />
                 {error && <p style={{fontSize:13,color:C.danger,marginTop:6}}>{error}</p>}
-                <button onClick={handleComment} disabled={submitting}
-                  style={{width:'100%',height:48,marginTop:10,borderRadius:12,fontWeight:700,fontSize:15,color:'white',background:C.blue,border:'none',cursor:'pointer',opacity:submitting?0.7:1}}>
-                  {submitting ? 'Submitting...' : 'Submit Community Update'}
-                </button>
+                <div style={{display:'flex',gap:8,marginTop:10}}>
+                  <label style={{flex:'0 0 auto',height:48,width:48,borderRadius:12,background:C.blueSoft,border:`1px solid ${C.blue}`,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
+                    <input type="file" accept="image/*" style={{display:'none'}} onChange={e=>{const f=e.target.files?.[0];if(f){setCommentPhoto(f);setCommentPhotoPreview(URL.createObjectURL(f));}}} />
+                    <svg viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2" width="20" height="20"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  </label>
+                  <button onClick={handleComment} disabled={submitting}
+                    style={{flex:1,height:48,borderRadius:12,fontWeight:700,fontSize:15,color:'white',background:C.blue,border:'none',cursor:'pointer',opacity:submitting?0.7:1}}>
+                    {submitting ? 'Submitting...' : 'Submit Community Update'}
+                  </button>
+                </div>
               </>
             )}
           </div>
