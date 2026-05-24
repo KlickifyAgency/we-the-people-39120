@@ -87,35 +87,19 @@ export function ReportForm() {
     } catch { fileRef.current?.click(); }
   }, []);
 
-  const compressImage = useCallback((canvas: HTMLCanvasElement): Promise<File> => {
-    return new Promise(resolve => {
-      const MAX = 1200;
-      let w = canvas.width, h = canvas.height;
-      if (w > MAX || h > MAX) {
-        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-        else { w = Math.round(w * MAX / h); h = MAX; }
-      }
-      const out = document.createElement('canvas');
-      out.width = w; out.height = h;
-      out.getContext('2d')!.drawImage(canvas, 0, 0, w, h);
-      out.toBlob(blob => {
-        resolve(new File([blob!], 'photo.jpg', { type: 'image/jpeg' }));
-      }, 'image/jpeg', 0.75);
-    });
-  }, []);
-
   const capturePhoto = useCallback(() => {
     if (!videoRef.current) return;
     const c = document.createElement('canvas');
     c.width = videoRef.current.videoWidth; c.height = videoRef.current.videoHeight;
     c.getContext('2d')!.drawImage(videoRef.current, 0, 0);
-    compressImage(c).then(file => {
-      setPhotoFile(file);
-      setPhotoPreview(URL.createObjectURL(file));
+    c.toBlob(blob => {
+      if (!blob) return;
+      setPhotoFile(new File([blob], 'photo.jpg', { type: 'image/jpeg' }));
+      setPhotoPreview(c.toDataURL('image/jpeg', 0.85));
       stream?.getTracks().forEach(t => t.stop());
       setStream(null); setCameraOpen(false);
-    });
-  }, [stream, compressImage]);
+    }, 'image/jpeg', 0.85);
+  }, [stream]);
 
   const closeCamera = useCallback(() => {
     stream?.getTracks().forEach(t => t.stop());
@@ -124,18 +108,8 @@ export function ReportForm() {
 
   const onFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return;
-    const img = new window.Image();
-    img.onload = () => {
-      const c = document.createElement('canvas');
-      c.width = img.width; c.height = img.height;
-      c.getContext('2d')!.drawImage(img, 0, 0);
-      compressImage(c).then(compressed => {
-        setPhotoFile(compressed);
-        setPhotoPreview(URL.createObjectURL(compressed));
-      });
-    };
-    img.src = URL.createObjectURL(f);
-  }, [compressImage]);
+    setPhotoFile(f); setPhotoPreview(URL.createObjectURL(f));
+  }, []);
 
   const handleSubmit = async () => {
     if (!category) return;
@@ -206,13 +180,13 @@ export function ReportForm() {
         </div>
         {step !== 'confirm' && (
           <button onClick={goNext} disabled={step === 'category' && !category}
-            style={{display:'flex',alignItems:'center',gap:6,height:48,paddingLeft:16,paddingRight:16,borderRadius:12,fontWeight:800,fontSize:15,color:C.white,background:C.blue,border:'none',cursor:'pointer',opacity:step==='category'&&!category?0.4:1,boxShadow:'0 2px 10px rgba(26,94,168,0.3)'}}>
+            style={{display:'flex',alignItems:'center',gap:6,height:40,paddingLeft:16,paddingRight:16,borderRadius:12,fontWeight:800,fontSize:15,color:C.white,background:C.blue,border:'none',cursor:'pointer',opacity:step==='category'&&!category?0.4:1,boxShadow:'0 2px 10px rgba(26,94,168,0.3)'}}>
             Next <ChevronRight size={18} />
           </button>
         )}
         {step === 'confirm' && (
           <button onClick={handleSubmit} disabled={submitting || !category}
-            style={{display:'flex',alignItems:'center',gap:6,height:48,paddingLeft:16,paddingRight:16,borderRadius:12,fontWeight:800,fontSize:15,color:C.white,background:C.green,border:'none',cursor:'pointer',opacity:submitting||!category?0.5:1,boxShadow:'0 2px 10px rgba(45,122,79,0.3)'}}>
+            style={{display:'flex',alignItems:'center',gap:6,height:40,paddingLeft:16,paddingRight:16,borderRadius:12,fontWeight:800,fontSize:15,color:C.white,background:C.green,border:'none',cursor:'pointer',opacity:submitting||!category?0.5:1,boxShadow:'0 2px 10px rgba(45,122,79,0.3)'}}>
             {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
             {submitting ? 'Sending…' : 'Submit'}
           </button>
@@ -367,7 +341,7 @@ export function ReportForm() {
           </div>
           <textarea value={description} onChange={e => setDescription(e.target.value)}
             placeholder="Example: There is a large pile of trash on the corner of Pine and MLK. It has been there since last Monday…"
-            style={{width:'100%',minHeight:150,padding:16,borderRadius:14,fontSize:16,lineHeight:1.6,resize:'none',outline:'none',border:`1.5px solid ${C.border}`,background:C.white,color:C.textMain,fontFamily:'inherit',boxSizing:'border-box'}}
+            style={{width:'100%',minHeight:150,padding:16,borderRadius:14,fontSize:15,lineHeight:1.6,resize:'none',outline:'none',border:`1.5px solid ${C.border}`,background:C.white,color:C.textMain,fontFamily:'inherit',boxSizing:'border-box'}}
             onFocus={e => (e.target.style.borderColor = C.blue)}
             onBlur={e => (e.target.style.borderColor = C.border)}
           />
