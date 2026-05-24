@@ -2,37 +2,67 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { List, User, Home } from 'lucide-react';
+import { Home, Map } from 'lucide-react';
 
-const NAV_ITEMS = [
-  { href: '/',        label: 'Home',    Icon: Home   },
-  { href: '/feed',    label: 'Feed',    Icon: List   },
-  { href: '/report',  label: 'Report',  Icon: null   },
-  { href: '/profile', label: 'Profile', Icon: User   },
+const NAV = [
+  { href: '/',     label: 'Home', Icon: Home },
+  { href: '/feed', label: 'Map',  Icon: Map  },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex max-w-lg mx-auto"
-      style={{background:'#FFFFFF',borderTop:'1px solid #DDE3EC',paddingBottom:'env(safe-area-inset-bottom)',boxShadow:'0 -2px 12px rgba(0,0,0,0.06)'}}>
-      {NAV_ITEMS.map(({ href, label, Icon }) => {
-        const isActive = href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href);
-        const isReport = href === '/report';
-        return (
-          <Link key={href} href={href} className="flex-1 flex flex-col items-center justify-center gap-1 py-3"
-            style={{textDecoration:'none'}}>
-            {isReport ? (
-              <div style={{width:44,height:44,borderRadius:14,background:'#1A5EA8',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:2,boxShadow:'0 4px 12px rgba(26,94,168,0.35)'}}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              </div>
-            ) : (
-              Icon ? <Icon size={22} strokeWidth={isActive ? 2.5 : 2} style={{color: isActive ? '#1A5EA8' : '#94A3B8', transition:'color 0.15s'}} /> : null
-            )}
-            <span style={{fontSize:10,fontWeight:isActive?700:600,color:isReport?'#1A5EA8':isActive?'#1A5EA8':'#94A3B8',transition:'color 0.15s'}}>{label}</span>
-          </Link>
-        );
-      })}
+    <nav style={{
+      position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+      width: '100%', maxWidth: '32rem', zIndex: 50,
+      display: 'flex', alignItems: 'center',
+      background: '#FFFFFF',
+      borderTop: '1px solid #E2E8F4',
+      paddingBottom: 'env(safe-area-inset-bottom)',
+      boxShadow: '0 -4px 24px rgba(15,23,42,0.10)',
+    }}>
+
+      {/* Left: Home */}
+      <NavItem href={NAV[0].href} label={NAV[0].label} Icon={NAV[0].Icon} active={pathname === '/'} />
+
+      {/* Center: BIG Report button */}
+      <Link href="/report" style={{
+        flex: '0 0 auto',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        gap: 3, padding: '8px 24px', textDecoration: 'none',
+      }}>
+        <div style={{
+          width: 64, height: 64, borderRadius: 20,
+          background: 'linear-gradient(135deg, #1D4ED8 0%, #059669 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 6px 28px rgba(29,78,216,0.45)',
+          marginBottom: 2,
+        }}>
+          {/* Camera icon */}
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="28" height="28">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
+        <span style={{ fontSize: 11, fontWeight: 800, color: '#1D4ED8', letterSpacing: '0.03em' }}>REPORT</span>
+      </Link>
+
+      {/* Right: Map/Feed */}
+      <NavItem href={NAV[1].href} label={NAV[1].label} Icon={NAV[1].Icon} active={pathname.startsWith('/feed') || pathname.startsWith('/map')} />
     </nav>
+  );
+}
+
+function NavItem({ href, label, Icon, active }: { href: string; label: string; Icon: React.ElementType; active: boolean }) {
+  return (
+    <Link href={href} style={{
+      flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+      justifyContent: 'center', gap: 4, padding: '14px 0', textDecoration: 'none',
+    }}>
+      <Icon size={26} strokeWidth={active ? 2.5 : 2} style={{ color: active ? '#1D4ED8' : '#9CA3AF', transition: 'color 0.15s' }} />
+      <span style={{ fontSize: 11, fontWeight: active ? 700 : 600, color: active ? '#1D4ED8' : '#9CA3AF', transition: 'color 0.15s' }}>
+        {label}
+      </span>
+    </Link>
   );
 }
