@@ -81,6 +81,23 @@ Antes de subir a Supabase Storage (`report-photos` bucket):
 - Si George dice "mejora el diseño", preguntar primero: ¿qué no le gusta? ¿referencias?
 - Al hacer revamp de homepage: NO convertirlo en marketing page pura — mantener lista de reports visible
 
+## REGLA #12 — LOGOS: SOLO logo-wtp.png ES CANÓNICO
+
+Un solo logo activo: `public/logo-wtp.png` (usado en homepage).
+Todos los demás logos fueron eliminados en sesión 2026-05-23. No agregar logos nuevos sin actualizar el src.
+
+## REGLA #13 — DOS ROUTES DE RESPOND, PROPÓSITOS DISTINTOS
+
+- `api/v1/respond` → alderman con token (link secreto de alderman)
+- `api/v1/reports/[id]/respond` → por ID de reporte (uso admin/directo)
+No son duplicados — no eliminar ninguno.
+
+## REGLA #14 — CRON REMINDERS: EXISTE Y TIENE LÓGICA
+
+`src/app/api/cron/reminders/route.ts` — creado 2026-05-23 (antes no existía → 404).
+Envía emails a aldermen en día 7/14/21/28 de reporte sin respuesta.
+Posts a Facebook para reportes críticos (28d+).
+
 ## REGLA #10 — RESPOND TOKEN: ÚNICO POR REPORTE
 
 Cada reporte genera `respond_token` (crypto.randomUUID) al crear.

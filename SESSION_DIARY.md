@@ -42,6 +42,27 @@
 
 ---
 
+## SESSION: 2026-05-23 (sesión 3) — LIMPIEZA MILITAR TOTAL
+
+**Hecho:**
+- Eliminados 7 archivos duplicados en `.vercel/` (README 2/3/4.txt, project 2/3/4.json)
+- Eliminado archivo `Build` vacío (0 bytes) en raíz
+- Eliminado `public/icons/public:logo-new.png` (nombre malformado por macOS)
+- Eliminado código muerto: `src/app/api/facebook-post/route.ts` (cero callsites)
+- Eliminado código muerto: `src/lib/ward-detection.ts` (cero imports, supersedido por server version)
+- Eliminados 12 logos huérfanos de `/public/`: logo.png, logo-white.png, logo-purple.png, logo-new.png, logo-dark.svg, logo-icon.svg, logo-wtp-new.svg, file.svg, globe.svg, vercel.svg, window.svg, icons/icon-32.png
+- Movidos PDFs (Chat History, Project Memory) de raíz → `docs/`
+- **CREADO** `src/app/api/cron/reminders/route.ts` — bug crítico: vercel.json lo referenciaba pero no existía (404 cada mañana). Nuevo cron: envía emails a aldermen en día 7/14/21/28 de inactividad + Facebook post para reportes 28d+
+
+**Falló:**
+- Nada
+
+**Pendiente:**
+- Deploy a Vercel para que el nuevo cron de reminders entre en efecto
+- Ver PENDING_BY_GEORGE.md para lista completa
+
+---
+
 ## TEMPLATE PARA PRÓXIMAS SESIONES
 
 ```
