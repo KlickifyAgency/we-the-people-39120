@@ -64,9 +64,22 @@ También agregar `RESEND_API_KEY` y `MAKE_WEBHOOK_URL`.
 
 ---
 
+## 🔴 DISEÑO PENDIENTE
+
+### 7. Acordar dirección de nuevo diseño ANTES de implementar
+El revamp Bold Civic Light fue rechazado. Antes de hacer cualquier nuevo intento de rediseño:
+- [ ] George decide: ¿qué le falta al diseño actual? ¿Más color? ¿Más grande? ¿Más moderno?
+- [ ] Mostrar referencias/ejemplos concretos antes de codificar
+- [ ] NO hacer full revamp sin aprobación explícita de George primero
+
+---
+
 ## ✅ COMPLETADO
 
 - [x] **Make.com webhook verificado** — URL activa, en .env.local y Vercel ✅
 - [x] **Make.com API key guardada** — `~/.claude_env.sh` + `.env.local` ✅
 - [x] **MAKE_WEBHOOK_URL en Vercel** — confirmado (seteada hace 86 días) ✅
 - [x] **Estructura militar creada** — SESSION_DIARY, GOLDEN_RULES, PENDING_BY_GEORGE, CLAUDE.md, memory files ✅
+- [x] **Archivos duplicados eliminados** — `route 2.ts` y `page 2.tsx` borrados ✅
+- [x] **Auditoría mobile completada** — iOS zoom, touch targets, overscroll, tap highlight ✅
+- [x] **Bold Civic Light revamp** — hecho y REVERTIDO (George no aprobó) ✅

@@ -19,6 +19,29 @@
 
 ---
 
+---
+
+## SESSION: 2026-05-23 (sesión 2) — UI REVAMP + REVERT + MOBILE AUDIT
+
+**Hecho:**
+- Eliminados archivos duplicados basura: `route 2.ts`, `page 2.tsx` ✅
+- Bold Civic Light UI revamp completo: nuevos logos SVG (logo-icon, logo-wtp-new, logo-dark), design system en globals.css (Manrope/Oswald/Inter, 18px base, paleta navy/blue/amber/green), BottomNav simplificado a 3 items, homepage reescrito, report detail reescrito, ReportCard actualizado
+- Auditoría mobile: fix iOS auto-zoom (inputs <16px), overscroll-behavior:none, -webkit-tap-highlight-color:transparent, touch-action:manipulation, nav buttons 40→48px, manifest colors actualizados a navy
+- Homepage: restaurados reports perdidos tras revamp (sección RecentReports con últimos 8)
+- **REVERT TOTAL**: George no le gustó el nuevo diseño → revertidos todos los archivos UI al estado pre-revamp (commit 0adb38b)
+- Los logos SVG nuevos quedaron en /public/ (no afectan el diseño revertido)
+- CLAUDE.md, GOLDEN_RULES.md, SESSION_DIARY.md, PENDING_BY_GEORGE.md siguen en el repo
+
+**Falló:**
+- Bold Civic Light revamp rechazado por George — "no me gusta para nada"
+- Nota: al hacer revamp del homepage, se perdió la lista de reports (se mostraba solo marketing page)
+
+**Pendiente:**
+- George quiere un nuevo diseño pero NO el Bold Civic Light — necesita acuerdo previo sobre dirección
+- Ver PENDING_BY_GEORGE.md para lista completa de pendientes
+
+---
+
 ## TEMPLATE PARA PRÓXIMAS SESIONES
 
 ```

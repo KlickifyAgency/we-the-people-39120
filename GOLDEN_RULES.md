@@ -73,6 +73,14 @@ Antes de subir a Supabase Storage (`report-photos` bucket):
 - Formato: JPEG, calidad 0.75
 - Tanto ReportForm.tsx como page.tsx comentarios comprimen antes de enviar
 
+## REGLA #11 — DISEÑO: APROBACIÓN PREVIA OBLIGATORIA
+
+**NUNCA hacer full UI revamp sin aprobación explícita de George primero.**
+- El revamp Bold Civic Light (2026-05-23) fue rechazado en su totalidad
+- Proceso correcto: mostrar mockups/referencias → George aprueba → implementar
+- Si George dice "mejora el diseño", preguntar primero: ¿qué no le gusta? ¿referencias?
+- Al hacer revamp de homepage: NO convertirlo en marketing page pura — mantener lista de reports visible
+
 ## REGLA #10 — RESPOND TOKEN: ÚNICO POR REPORTE
 
 Cada reporte genera `respond_token` (crypto.randomUUID) al crear.
