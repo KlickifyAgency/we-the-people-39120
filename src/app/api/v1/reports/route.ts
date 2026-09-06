@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase';
 import { ReportCategory } from '@/lib/types';
 import { sendAldermanNotification } from '@/lib/email';
 import { detectWardServer } from '@/lib/ward-detection-server';
-import { MAYOR } from '@/lib/constants';
+import { MAYOR, REPORT_PUBLIC_COLS } from '@/lib/constants';
 import { notifyAllCitizens } from '@/lib/notify-citizens';
 
 export async function GET(req: NextRequest) {
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from('reports')
-    .select('*, ward:wards(ward_number)')
+    .select(`${REPORT_PUBLIC_COLS}, ward:wards(ward_number)`)
     .order('created_at', { ascending: false })
     .limit(100);
 
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
   const { data: report, error } = await supabase
     .from('reports')
     .insert({ category, lat, lng, description, anonymous, photo_url, status: 'pending', respond_token: respondToken, ward_number: wardNumber, user_id: userId ?? null })
-    .select('*, ward:wards(ward_number)')
+    .select(`${REPORT_PUBLIC_COLS}, ward:wards(ward_number)`)
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -138,7 +138,9 @@ export async function POST(req: NextRequest) {
       };
       const label = LABELS[category] ?? category;
       const ALDERMEN: Record<number,string> = {1:'Valencia Hall',2:'Billie Joe Frazier',3:'Sarah Carter-Smith',4:'Felicia Bridgewater-Irving',5:'Benjamin Davis',6:'Curtis Moroney'};
-      const wardNum = report.ward?.ward_number ?? detectWardServer(lat, lng)?.ward ?? '?';
+      // ward_id is always null in Phase 1 (see lib/geo.ts), so the wards join never
+      // resolves; wardNumber above is the value actually stored on the row.
+      const wardNum = wardNumber ?? '?';
       const aldermanName = ALDERMEN[Number(wardNum)] ?? 'Your Alderman';
       const reportUrl = `https://we-the-people-39120.vercel.app/report/${report.id}`;
       const message = `🚨 NEW REPORT — ${label.toUpperCase()}\n\n📍 Ward ${wardNum} — Natchez, MS 39120\n🏛️ Alderman: ${aldermanName}${description ? `\n\n"${description.slice(0, 200)}${description.length > 200 ? '...' : ''}"` : ''}\n\n⏱️ ${aldermanName} has 30 days to respond publicly.\n👉 View & support this report: ${reportUrl}\n\n#WeThePeople39120 #Natchez #NatchezMS #Ward${wardNum} #Mississippi`;

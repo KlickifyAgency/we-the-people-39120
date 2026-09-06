@@ -12,6 +12,10 @@ export const BRAND = {
   colors: { blue: '#1e3a8a', gold: '#d97706', green: '#16a34a', red: '#dc2626' },
 } as const;
 
+// Every reports column EXCEPT respond_token, which is the alderman's only
+// credential in /api/v1/respond and must never reach a public client.
+export const REPORT_PUBLIC_COLS = 'id,user_id,photo_url,category,description,lat,lng,ward_id,status,created_at,updated_at,anonymous,me_too_count,view_count,is_escalated,alderman_response,alderman_responded_at,reminder_10_sent,reminder_20_sent,escalated_at,ward_number';
+
 export const NATCHEZ_CENTER: [number, number] = [31.5604, -91.4032];
 export const NATCHEZ_ZOOM = 13;
 

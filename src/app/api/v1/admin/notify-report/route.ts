@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notifyAllCitizens } from '@/lib/notify-citizens';
 import { createClient } from '@supabase/supabase-js';
+import { isAuthed, unauthorized } from '@/lib/admin-auth';
 
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
+  if (!(await isAuthed(req))) return unauthorized();
   const { reportId } = await req.json();
   if (!reportId) return NextResponse.json({ error: 'Missing reportId' }, { status: 400 });
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);

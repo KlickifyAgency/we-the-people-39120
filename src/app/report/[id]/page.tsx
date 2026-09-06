@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { REPORT_PUBLIC_COLS } from '@/lib/constants';
 import { createBrowserClient } from '@supabase/ssr';
 import { ThumbsUp, MapPin, CheckCircle2, Loader2 } from 'lucide-react';
 
@@ -62,7 +63,7 @@ export default function ReportPage({ params }: { params: any }) {
 
   useEffect(() => {
     if (!reportId) return;
-    supabase.from('reports').select('*, ward:wards(ward_number)').eq('id', reportId).single()
+    supabase.from('reports').select(`${REPORT_PUBLIC_COLS}, ward:wards(ward_number)`).eq('id', reportId).single()
       .then(({ data }) => { setReport(data); setMetooCount(data?.me_too_count ?? 0); });
     fetch(`/api/v1/comments?report_id=${reportId}`).then(r=>r.json()).then(data=>setComments(Array.isArray(data)?data:[]));
     void supabase.rpc('increment_view_count', { report_id: reportId });

@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
-const ADMIN_PASSWORD='Gas05720572!';
+import { REPORT_PUBLIC_COLS } from '@/lib/constants';
 const ALDERMEN:Record<number,string>={1:'Valencia Hall',2:'Billie Joe Frazier',3:'Sarah Carter-Smith',4:'Felicia Bridgewater-Irving',5:'Benjamin Davis',6:'Curtis Moroney'};
 const PROFANITY=['fuck','shit','ass','bitch','damn','crap','piss','dick','cock','pussy','bastard','nigger','nigga','faggot','retard','whore','slut','cunt'];
 function hasProfanity(t:string){return PROFANITY.some(w=>t.toLowerCase().includes(w));}
@@ -29,7 +29,7 @@ export default function AdminDashboard(){
   const load=useCallback(async()=>{
     setLoading(true);
     const [rResp, uResp]=await Promise.all([
-      supabase.from('reports').select('*').order('created_at',{ascending:false}),
+      supabase.from('reports').select(REPORT_PUBLIC_COLS).order('created_at',{ascending:false}),
       fetch('/api/v1/admin/users').then(r=>r.json()).catch(()=>[])
     ]);
     setReports(rResp.data??[]);
@@ -37,9 +37,12 @@ export default function AdminDashboard(){
     setLoading(false);
   },[]);
   useEffect(()=>{if(auth)load();},[auth,load]);
+  useEffect(()=>{fetch('/api/v1/admin/login').then(r=>r.json()).then(d=>{if(d?.authed)setAuth(true);}).catch(()=>{});},[]);
+  async function doLogin(){const res=await fetch('/api/v1/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});if(res.ok){setPw('');setPwErr(false);setAuth(true);}else setPwErr(true);}
+  async function doLogout(){await fetch('/api/v1/admin/login',{method:'DELETE'}).catch(()=>{});setAuth(false);}
   async function delReport(id:string){if(!confirm('Delete permanently?'))return;const res=await fetch('/api/v1/admin/reports',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});if(res.ok)setReports(r=>r.filter(x=>x.id!==id));else alert('Delete failed');}
-  async function saveEdit(){setSaving(true);await supabase.from('reports').update({description:editDesc,status:editStatus}).eq('id',editR.id);setReports(r=>r.map(x=>x.id===editR.id?{...x,description:editDesc,status:editStatus}:x));setEditR(null);setSaving(false);}
-  async function setStatus(id:string,status:string){await supabase.from('reports').update({status}).eq('id',id);setReports(r=>r.map(x=>x.id===id?{...x,status}:x));}
+  async function saveEdit(){setSaving(true);await fetch('/api/v1/admin/reports',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:editR.id,description:editDesc,status:editStatus})});setReports(r=>r.map(x=>x.id===editR.id?{...x,description:editDesc,status:editStatus}:x));setEditR(null);setSaving(false);}
+  async function setStatus(id:string,status:string){await fetch('/api/v1/admin/reports',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status})});setReports(r=>r.map(x=>x.id===id?{...x,status}:x));}
   async function postToFacebook(){
     if(!fbMsg.trim()){setFbResult('Please write a message first.');return;}
     setFbPosting(true);setFbResult('');
@@ -55,7 +58,7 @@ export default function AdminDashboard(){
     const csv=rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
     const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='wtp-users.csv';a.click();
   }
-  if(!auth)return(<div style={{minHeight:'100vh',background:'#060610',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'system-ui'}}><div style={{width:340,padding:40,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(168,85,247,0.3)',borderRadius:24,textAlign:'center'}}><div style={{fontSize:48,marginBottom:16}}>🏛️</div><div style={{fontSize:22,fontWeight:900,color:'#fff',marginBottom:4}}>Admin Access</div><div style={{fontSize:13,color:'rgba(255,255,255,0.4)',marginBottom:28}}>We The People 39120</div><input type="password" placeholder="Password" value={pw} onChange={e=>{setPw(e.target.value);setPwErr(false);}} onKeyDown={e=>e.key==='Enter'&&(pw===ADMIN_PASSWORD?setAuth(true):setPwErr(true))} style={{width:'100%',height:48,borderRadius:12,border:`1px solid ${pwErr?'#f87171':'rgba(255,255,255,0.1)'}`,background:'rgba(255,255,255,0.06)',color:'#fff',fontSize:14,padding:'0 16px',outline:'none',boxSizing:'border-box',marginBottom:12}}/>{pwErr&&<div style={{color:'#f87171',fontSize:12,marginBottom:12}}>Incorrect password</div>}<button onClick={()=>pw===ADMIN_PASSWORD?setAuth(true):setPwErr(true)} style={{width:'100%',height:48,borderRadius:12,background:'linear-gradient(135deg,#7c3aed,#a855f7)',border:'none',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer'}}>Enter Dashboard</button></div></div>);
+  if(!auth)return(<div style={{minHeight:'100vh',background:'#060610',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'system-ui'}}><div style={{width:340,padding:40,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(168,85,247,0.3)',borderRadius:24,textAlign:'center'}}><div style={{fontSize:48,marginBottom:16}}>🏛️</div><div style={{fontSize:22,fontWeight:900,color:'#fff',marginBottom:4}}>Admin Access</div><div style={{fontSize:13,color:'rgba(255,255,255,0.4)',marginBottom:28}}>We The People 39120</div><input type="password" placeholder="Password" value={pw} onChange={e=>{setPw(e.target.value);setPwErr(false);}} onKeyDown={e=>{if(e.key==='Enter')void doLogin();}} style={{width:'100%',height:48,borderRadius:12,border:`1px solid ${pwErr?'#f87171':'rgba(255,255,255,0.1)'}`,background:'rgba(255,255,255,0.06)',color:'#fff',fontSize:14,padding:'0 16px',outline:'none',boxSizing:'border-box',marginBottom:12}}/>{pwErr&&<div style={{color:'#f87171',fontSize:12,marginBottom:12}}>Incorrect password</div>}<button onClick={()=>void doLogin()} style={{width:'100%',height:48,borderRadius:12,background:'linear-gradient(135deg,#7c3aed,#a855f7)',border:'none',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer'}}>Enter Dashboard</button></div></div>);
   const total=reports.length,resolved=reports.filter(r=>r.status==='resolved').length,pending=reports.filter(r=>['pending','confirmed'].includes(r.status)).length,ignored=reports.filter(r=>r.status==='ignored').length,withResp=reports.filter(r=>r.alderman_response).length,flagged=reports.filter(r=>r.description&&hasProfanity(r.description)),rate=total>0?Math.round((resolved/total)*100):0;
   const wardStats=Object.entries(ALDERMEN).map(([w,name])=>{const wr=reports.filter(r=>r.ward_number===Number(w));const res=wr.filter(r=>r.status==='resolved').length,ign=wr.filter(r=>r.status==='ignored').length,resp=wr.filter(r=>r.alderman_response).length,score=wr.length>0?Math.round(((res+resp*0.5)/wr.length)*100):0;return{ward:Number(w),name,total:wr.length,resolved:res,ignored:ign,responded:resp,score};}).sort((a,b)=>b.score-a.score);
   const catCounts:Record<string,number>={};reports.forEach(r=>{catCounts[r.category]=(catCounts[r.category]??0)+1;});const topCats=Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).slice(0,6);
@@ -65,7 +68,7 @@ export default function AdminDashboard(){
   return(<div style={{minHeight:'100vh',background:'#060610',color:'#fff',fontFamily:'system-ui',paddingBottom:40}}>
     <div style={{borderBottom:'1px solid rgba(255,255,255,0.07)',padding:'16px 24px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50,background:'rgba(6,6,16,0.95)',backdropFilter:'blur(20px)'}}>
       <div style={{display:'flex',alignItems:'center',gap:12}}><div style={{width:38,height:38,borderRadius:10,background:'linear-gradient(135deg,#1A5EA8,#2D7A4F)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20}}>🏛️</div><div><div style={{fontWeight:900,fontSize:16}}>WTP 39120 Admin</div><div style={{fontSize:11,color:'rgba(255,255,255,0.4)'}}>Natchez, Mississippi</div></div></div>
-      <div style={{display:'flex',gap:8}}><button onClick={load} style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8,color:'rgba(255,255,255,0.6)',fontSize:12,padding:'6px 14px',cursor:'pointer',fontWeight:600}}>↺ Refresh</button><button onClick={()=>setAuth(false)} style={{background:'rgba(248,113,113,0.12)',border:'1px solid rgba(248,113,113,0.25)',borderRadius:8,color:'#f87171',fontSize:12,padding:'6px 14px',cursor:'pointer',fontWeight:600}}>Sign Out</button></div>
+      <div style={{display:'flex',gap:8}}><button onClick={load} style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8,color:'rgba(255,255,255,0.6)',fontSize:12,padding:'6px 14px',cursor:'pointer',fontWeight:600}}>↺ Refresh</button><button onClick={()=>void doLogout()} style={{background:'rgba(248,113,113,0.12)',border:'1px solid rgba(248,113,113,0.25)',borderRadius:8,color:'#f87171',fontSize:12,padding:'6px 14px',cursor:'pointer',fontWeight:600}}>Sign Out</button></div>
     </div>
     <div style={{display:'flex',gap:4,padding:'16px 24px 0',overflowX:'auto'}}>{TABS.map(t=>(<button key={t.id} onClick={()=>setTab(t.id as any)} style={{padding:'8px 18px',borderRadius:10,border:'none',cursor:'pointer',fontWeight:700,fontSize:13,whiteSpace:'nowrap',background:tab===t.id?'linear-gradient(135deg,#1A5EA8,#2D7A4F)':'rgba(255,255,255,0.04)',color:tab===t.id?'#fff':'rgba(255,255,255,0.5)'}}>{t.icon} {t.label}</button>))}</div>
     <div style={{padding:24}}>

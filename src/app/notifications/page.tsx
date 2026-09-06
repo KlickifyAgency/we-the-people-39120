@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { REPORT_PUBLIC_COLS } from '@/lib/constants';
 import { createBrowserClient } from '@supabase/ssr';
 import Link from 'next/link';
 import { Bell } from 'lucide-react';
@@ -37,7 +38,7 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     supabase.from('reports')
-      .select('*')
+      .select(REPORT_PUBLIC_COLS)
       .order('created_at', { ascending: false })
       .limit(50)
       .then(({ data }) => { setReports(data ?? []); setLoading(false); });
